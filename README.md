@@ -467,10 +467,7 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
 - `GET /api/notifications/:id` — Obtener notificación por id.
   - `PUT /api/notifications/:id/read` — Marcar como leída.
 ## Modelos de datos (TypeScript)
-### `Category.ts`
-_Este modelo no contiene definición en `src/models` ni muestras disponibles._
-### `Notification.ts`
-_Este modelo no contiene definición en `src/models` ni muestras disponibles._
+
 ### `Order.ts`
 ```ts
 import { Address } from './User';
@@ -522,8 +519,7 @@ export interface Product {
     updatedAt: Date;
   }
 ```
-### `Shipment.ts`
-_Este modelo no contiene definición en `src/models` ni muestras disponibles._
+
 ### `User.ts`
 ```ts
 export interface User {
@@ -555,12 +551,3 @@ export interface User {
 - `409 Conflict` — Conflicto (ej. email o sku duplicado).
 - `422 Unprocessable Entity` — Datos semánticamente inválidos.
 - `500 Internal Server Error` — Error del servidor.
-  ## Archivos importantes
-- `src/controllers/*` — Lógica de endpoints.
-- `src/routes/*` — Definición de rutas.
-- `src/models/*` — Interfaces TypeScript (modelo de datos).
-- `src/data/mock/*` — Datos de ejemplo usados por la API.
-  ## Notas finales y siguientes pasos para la siguiente entrega
-- Revisar y completar las interfaces vacías en `src/models` para tener tipado estricto.
-- Implementar autenticación (JWT) y protección de rutas si se requiere.
-- Reemplazar `src/data/mock` por una capa de persistencia real (Postgres, MongoDB, etc.).
