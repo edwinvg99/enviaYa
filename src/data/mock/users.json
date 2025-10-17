@@ -1,0 +1,53 @@
+[
+  {
+    "id": 1,
+    "email": "admin@enviaya.com",
+    "password": "$2a$10$iZQ.KIt9Os/OSxOZt2sNyuTXE9SdPFrh1BB.L7XNuXw/3VWAHZdbe",
+    "name": "Admin EnviaYa",
+    "phone": "+573001234567",
+    "address": {
+      "street": "Calle 50 #45-30",
+      "city": "Medellín",
+      "state": "Antioquia",
+      "postalCode": "050001"
+    },
+    "emailVerified": true,
+    "role": "ADMIN",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "email": "usuario@test.com",
+    "password": "$2a$10$xdMjOrcYUgHtBYyTsHyOAefSyDTEoUNGSTXbfDdKh2bdveEqn5rqa",
+    "name": "Usuario Test",
+    "phone": "+573109876543",
+    "address": {
+      "street": "Carrera 70 #35-10",
+      "city": "Bogotá",
+      "state": "Cundinamarca",
+      "postalCode": "110111"
+    },
+    "emailVerified": true,
+    "role": "USER",
+    "createdAt": "2025-02-01T00:00:00.000Z",
+    "updatedAt": "2025-02-01T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "email": "usuario@example.com",
+    "password": "$2a$10$HWKUokVL3faHbFWpkx17euVuPSYVmY0QWfiB0VN8QPlX6CXU3X7Tq",
+    "name": "Nombre Usuario",
+    "phone": "+573001234567",
+    "address": {
+      "street": "Calle 123 #45-67",
+      "city": "Medellín",
+      "state": "Antioquia",
+      "postalCode": "050001"
+    },
+    "emailVerified": false,
+    "role": "USER",
+    "createdAt": "2025-10-14T23:51:03.568Z",
+    "updatedAt": "2025-10-14T23:51:03.568Z"
+  }
+]

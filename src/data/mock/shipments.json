@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "orderId": 1,
+    "userId": 2,
+    "trackingNumber": "TRK-20251010-54321",
+    "status": "EN_ENTREGA",
+    "currentLocation": "Centro de Distribución Bogotá",
+    "estimatedDelivery": "2025-10-20T00:00:00.000Z",
+    "history": [
+      {
+        "status": "PENDIENTE",
+        "location": "Medellín",
+        "description": "Paquete recibido en origen",
+        "timestamp": "2025-10-10T10:00:00.000Z"
+      },
+      {
+        "status": "EN_TRANSITO",
+        "location": "Centro de Distribución Bogotá",
+        "description": "Paquete en tránsito",
+        "timestamp": "2025-10-12T15:30:00.000Z"
+      },
+      {
+        "status": "EN_TRANSITO",
+        "timestamp": "2025-10-14T21:33:41.819Z"
+      },
+      {
+        "status": "EN_TRANSITO",
+        "timestamp": "2025-10-14T21:33:50.805Z"
+      },
+      {
+        "status": "EN_ENTREGA",
+        "location": "Repartidor en ruta 83",
+        "description": "Salió para entrega del local",
+        "timestamp": "2025-10-14T22:37:33.746Z"
+      }
+    ],
+    "carrier": "EnviaYa Express",
+    "shippingAddress": {
+      "street": "Carrera 70 #35-10",
+      "city": "Bogotá",
+      "state": "Cundinamarca",
+      "postalCode": "110111"
+    },
+    "createdAt": "2025-10-10T10:00:00.000Z",
+    "updatedAt": "2025-10-14T22:37:33.746Z"
+  },
+  {
+    "id": 2,
+    "orderId": 2,
+    "userId": 1,
+    "trackingNumber": "TRK-20251011-12345",
+    "status": "ENTREGADO",
+    "currentLocation": "Destinatario",
+    "estimatedDelivery": "2025-10-15T00:00:00.000Z",
+    "history": [
+      {
+        "status": "PENDIENTE",
+        "location": "Cali",
+        "description": "Paquete recibido en origen",
+        "timestamp": "2025-10-11T09:00:00.000Z"
+      },
+      {
+        "status": "EN_TRANSITO",
+        "location": "Centro de Distribución",
+        "description": "En camino",
+        "timestamp": "2025-10-12T10:00:00.000Z"
+      },
+      {
+        "status": "EN_ENTREGA",
+        "location": "Repartidor en ruta",
+        "description": "Salió para entrega",
+        "timestamp": "2025-10-14T08:00:00.000Z"
+      },
+      {
+        "status": "ENTREGADO",
+        "location": "Destinatario",
+        "description": "Entregado exitosamente",
+        "timestamp": "2025-10-14T14:30:00.000Z"
+      }
+    ],
+    "carrier": "EnviaYa Express",
+    "shippingAddress": {
+      "street": "Calle 50 #45-30",
+      "city": "Medellín",
+      "state": "Antioquia",
+      "postalCode": "050001"
+    },
+    "createdAt": "2025-10-11T09:00:00.000Z",
+    "updatedAt": "2025-10-14T14:30:00.000Z"
+  }
+]
