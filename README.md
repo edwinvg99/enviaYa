@@ -38,12 +38,11 @@ Erorres usan:
 La API en esta versión _mock_ usa datos de ejemplo en `src/data/mock` y no implementa tokens JWT activos en todos los endpoints. Revisar `src/middlewares` y controladores si se desea añadir protección por autenticación.
 ## Endpoints
 A continuación se listan los endpoints principales. Se muestran parámetros (path/query/body), códigos HTTP manejados y ejemplos de request/response.
-### Usuarios (`/api/users`)
-- `POST /api/users/register` — Registrar usuario.
+### Usuarios (`/api/v1/users/`)
+- `POST /api/v1/users/register` — Registrar usuario.
   - Body (ejemplo):
 ```json
 {
-  "id": 2,
   "email": "usuario@test.com",
   "password": "$2a$10$xdMjOrcYUgHtBYyTsHyOAefSyDTEoUNGSTXbfDdKh2bdveEqn5rqa",
   "name": "Usuario Test",
@@ -53,12 +52,7 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
     "city": "Bogotá",
     "state": "Cundinamarca",
     "postalCode": "110111"
-  },
-  "emailVerified": true,
-  "role": "USER",
-  "createdAt": "2025-02-01T00:00:00.000Z",
-  "updatedAt": "2025-02-01T00:00:00.000Z"
-}
+  }
 ```
   - Respuestas:
     - `201 Created` — Usuario creado. Devuelve el usuario (sin password en la respuesta).
@@ -87,12 +81,12 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
   }
 }
 ```
-- `POST /api/users/login` — Login de usuario.
+- `POST /api/v1/users/login` — Login de usuario.
   - Body: `{ "email": "...", "password": "..." }`
   - Respuestas:
     - `200 OK` — Login exitoso (puede devolver token en implementación real).
     - `401 Unauthorized` — Credenciales inválidas.
-- `GET /api/users` — Listar usuarios.
+- `GET /api/v1/users/` — Listar usuarios.
   - Query: opcional `?limit=&page=`.
   - `200 OK` — Lista de usuarios.
 ```json
@@ -102,36 +96,20 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
     {
       "id": 1,
       "email": "admin@enviaya.com",
-      "password": "$2a$10$iZQ.KIt9Os/OSxOZt2sNyuTXE9SdPFrh1BB.L7XNuXw/3VWAHZdbe",
+      "password": "1234678",
       "name": "Admin EnviaYa",
       "phone": "+573001234567",
-      "address": {
-        "street": "Calle 50 #45-30",
-        "city": "Medellín",
-        "state": "Antioquia",
-        "postalCode": "050001"
-      },
       "emailVerified": true,
-      "role": "ADMIN",
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-01-01T00:00:00.000Z"
+      "role": "ADMIN"
     },
     {
       "id": 2,
       "email": "usuario@test.com",
-      "password": "$2a$10$xdMjOrcYUgHtBYyTsHyOAefSyDTEoUNGSTXbfDdKh2bdveEqn5rqa",
+      "password": "789456123",
       "name": "Usuario Test",
       "phone": "+573109876543",
-      "address": {
-        "street": "Carrera 70 #35-10",
-        "city": "Bogotá",
-        "state": "Cundinamarca",
-        "postalCode": "110111"
-      },
       "emailVerified": true,
-      "role": "USER",
-      "createdAt": "2025-02-01T00:00:00.000Z",
-      "updatedAt": "2025-02-01T00:00:00.000Z"
+      "role": "USER"
     },
     {
       "id": 3,
@@ -139,30 +117,21 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
       "password": "$2a$10$HWKUokVL3faHbFWpkx17euVuPSYVmY0QWfiB0VN8QPlX6CXU3X7Tq",
       "name": "Nombre Usuario",
       "phone": "+573001234567",
-      "address": {
-        "street": "Calle 123 #45-67",
-        "city": "Medellín",
-        "state": "Antioquia",
-        "postalCode": "050001"
-      },
       "emailVerified": false,
-      "role": "USER",
-      "createdAt": "2025-10-14T23:51:03.568Z",
-      "updatedAt": "2025-10-14T23:51:03.568Z"
+      "role": "USER"
     }
   ]
 }
 ```
-- `GET /api/users/:id` — Obtener usuario por id.
+- `GET /api/v1/users/:id` — Obtener usuario por id.
   - Path: `id` (number).
   - `200 OK` — Usuario.
   - `404 Not Found` — Usuario no encontrado.
-### Productos (`/api/products`)
-- `POST /api/products` — Crear producto.
+### Productos (`/api/v1/products/`)
+- `POST /api/v1/products/` — Crear producto.
   - Body (ejemplo):
 ```json
 {
-  "id": 1,
   "name": "Laptop HP Pavilion",
   "sku": "LAP-HP-001",
   "description": "Laptop HP Pavilion 15 pulgadas, Intel i5, 8GB RAM",
@@ -173,13 +142,11 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
   "images": [
     "https://example.com/laptop1.jpg"
   ],
-  "weight": 2.5,
-  "createdAt": "2025-01-15T00:00:00.000Z",
-  "updatedAt": "2025-01-15T00:00:00.000Z"
+  "weight": 2.5
 }
 ```
   - Códigos: `201 Created`, `400 Bad Request`, `409 Conflict` (SKU repetido).
-- `GET /api/products` — Listar productos.
+- `GET /api/v1/products/` — Listar productos.
     - Query: `?categoryId=&active=&q=&limit=&page=`.
   - `200 OK` — Lista.
 ```json
@@ -199,8 +166,6 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
         "https://example.com/laptop1.jpg"
       ],
       "weight": 2.5,
-      "createdAt": "2025-01-15T00:00:00.000Z",
-      "updatedAt": "2025-01-15T00:00:00.000Z"
     },
     {
       "id": 2,
@@ -215,8 +180,6 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
         "https://example.com/mouse1.jpg"
       ],
       "weight": 0.3,
-      "createdAt": "2025-01-20T00:00:00.000Z",
-      "updatedAt": "2025-01-20T00:00:00.000Z"
     },
     {
       "id": 3,
@@ -231,15 +194,13 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
         "https://example.com/teclado1.jpg"
       ],
       "weight": 1.2,
-      "createdAt": "2025-10-14T19:19:45.407Z",
-      "updatedAt": "2025-10-14T19:19:45.407Z"
     }
   ]
 }
 ```
-- `GET /api/products/:id` — Obtener producto por id.
-### Categorías (`/api/categories`)
-- `GET /api/categories` — Listar categorías.
+- `GET /api/v1/products/:id` — Obtener producto por id.
+### Categorías (`/api/v1/categories/`)
+- `GET /api/v1/categories/` — Listar categorías.
   - Ejemplo respuesta:
 ```json
 {
@@ -247,30 +208,32 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
   "data": [
     {
       "id": 1,
+    "name": "Laptop HP Pavilion",
+    "sku": "LAP-HP-001",
+    "description": "Laptop HP Pavilion 15 pulgadas, Intel i5, 8GB RAM",
+    "price": 2500000,
+    "stock": 15,
+    "categoryId": 1,
+    "category": {
+      "id": 1,
       "name": "Computadores",
-      "description": "Laptops, desktops y accesorios",
-      "active": true,
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-01-01T00:00:00.000Z"
+      "description": "Laptops, desktops y accesorios"
     },
-    {
-      "id": 2,
-      "name": "Accesorios",
-      "description": "Periféricos y accesorios tecnológicos",
-      "active": true,
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-01-01T00:00:00.000Z"
-    }
+    "active": true,
+    "images": [
+      "https://example.com/laptop1.jpg"
+    ],
+    "weight": 2.5
+    },
   ]
 }
 ```
-- `GET /api/categories/:id` — Obtener categoría por id.
-### Órdenes (`/api/orders`)
-- `POST /api/orders` — Crear orden.
+- `GET /api/v1/categories/:id` — Obtener categoría por id.
+### Órdenes (`/api/v1/orders/`)
+- `POST /api/v1/orders/` — Crear orden.
   - Body (ejemplo):
 ```json
 {
-  "id": 1,
   "orderNumber": "ORD-20251014-94949",
   "status": "PENDIENTE",
   "userId": 2,
@@ -298,7 +261,7 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
 }
 ```
   - Códigos: `201 Created`, `422 Unprocessable Entity` (datos inválidos), `404 Not Found` (producto/usuario no existe).
-- `GET /api/orders` — Listar órdenes (opcional `?userId=`)
+- `GET /api/v1/orders/` — Listar órdenes (opcional `?userId=`)
     - Ejemplo respuesta:
 ```json
 {
@@ -355,10 +318,10 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
   ]
 }
 ```
-- `GET /api/orders/:id` — Obtener orden por id.
-- `PUT /api/orders/:id/cancel` — Cancelar orden (cambia status a `CANCELADO`).
-  ### Envíos (`/api/shipments`)
-- `GET /api/shipments` — Listar envíos. Query opcional `?userId=&status=`.
+- `GET /api/v1/orders/:id` — Obtener orden por id.
+- `PUT /api/v1/orders/:id/cancel` — Cancelar orden (cambia status a `CANCELADO`).
+  ### Envíos (`/api/v1/shipments/`)
+- `GET /api/v1/shipments/` — Listar envíos. Query opcional `?userId=&status=`.
     - Ejemplo respuesta:
 ```json
 {
@@ -457,15 +420,15 @@ A continuación se listan los endpoints principales. Se muestran parámetros (pa
   ]
 }
 ```
-- `GET /api/shipments/tracking/:trackingNumber` — Buscar envío por número de tracking.
-- `GET /api/shipments/:id` — Obtener envío por id.
-  - `PUT /api/shipments/:id/status` — Actualizar estado del envío.
+- `GET /api/v1/shipments/tracking/:trackingNumber` — Buscar envío por número de tracking.
+- `GET /api/v1/shipments/:id` — Obtener envío por id.
+  - `PUT /api/v1/shipments/:id/status` — Actualizar estado del envío.
   - Body ejemplo: `{ "status": "EN_TRANSITO", "location": "Centro de distribución...", "description": "..." }`
   - Códigos: `200 OK`, `422 Unprocessable Entity`, `404 Not Found`.
-### Notificaciones (`/api/notifications`)
-- `GET /api/notifications` — Listar notificaciones. Query opcional `?userId=`.
-- `GET /api/notifications/:id` — Obtener notificación por id.
-  - `PUT /api/notifications/:id/read` — Marcar como leída.
+### Notificaciones (`/api/v1/notifications/`)
+- `GET /api/v1/notifications/` — Listar notificaciones. Query opcional `?userId=`.
+- `GET /api/v1/notifications/:id` — Obtener notificación por id.
+  - `PUT /api/v1/notifications/:id/read` — Marcar como leída.
 ## Modelos de datos (TypeScript)
 
 ### `Order.ts`
