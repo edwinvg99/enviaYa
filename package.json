@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
-  "dev": "nodemon --watch src --ext ts,tsx --ignore src/data/mock --exec ts-node src/server.ts",
+    "dev": "nodemon --watch src --ext ts,tsx --ignore src/infrastructure/persistence/data/mock --exec ts-node src/server.ts",
     "build": "tsc",
     "test": "jest",
     "lint": "eslint . --ext .ts",

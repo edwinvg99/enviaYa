@@ -1,14 +1,14 @@
 import express, { Application } from 'express';
 import cors from 'cors';
-import usersRouter from './routes/users.routes';
-import productsRouter from './routes/products.routes';
-import categoriesRouter from './routes/categories.routes';
-import ordersRouter from './routes/orders.routes';
-import shipmentsRouter from './routes/shipments.routes';
-import notificationsRouter from './routes/notifications.routes';
-import { errorHandler } from './middlewares/errorHandler';
-import { loggerMiddleware } from './middlewares/logger';
-import { config } from './config/environment';
+import usersRouter from './infrastructure/http/routes/users.routes';
+import productsRouter from './infrastructure/http/routes/products.routes';
+import categoriesRouter from './infrastructure/http/routes/categories.routes';
+import ordersRouter from './infrastructure/http/routes/orders.routes';
+import shipmentsRouter from './infrastructure/http/routes/shipments.routes';
+import notificationsRouter from './infrastructure/http/routes/notifications.routes';
+import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
+import { loggerMiddleware } from './infrastructure/http/middlewares/logger';
+import { config } from './infrastructure/config/environment';
 
 const app: Application = express();
 
@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(loggerMiddleware);
 
 import { Request, Response, NextFunction } from 'express';
-import { errorResponse } from './utils/responses';
+import { errorResponse } from './shared/utils/responses';
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   if (err && err.type === 'entity.parse.failed') {
