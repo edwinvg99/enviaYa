@@ -1,0 +1,19 @@
+[
+    {
+      "id": 1,
+      "name": "Computadores",
+      "description": "Laptops, desktops y accesorios",
+      "active": true,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Accesorios",
+      "description": "Periféricos y accesorios tecnológicos",
+      "active": true,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    }
+  ]
+  

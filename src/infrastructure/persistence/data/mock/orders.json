@@ -1,0 +1,194 @@
+[
+  {
+    "id": 1,
+    "orderNumber": "ORD-20251014-94949",
+    "status": "PENDIENTE",
+    "userId": 2,
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 1,
+        "unitPrice": 2500000
+      },
+      {
+        "productId": 2,
+        "quantity": 2,
+        "unitPrice": 350000
+      }
+    ],
+    "shippingAddress": {
+      "street": "Carrera 70 #35-10",
+      "city": "Bogotá",
+      "state": "Cundinamarca",
+      "postalCode": "110111"
+    },
+    "paymentMethod": "credit_card",
+    "createdAt": "2025-10-14T20:23:16.838Z",
+    "updatedAt": "2025-10-14T20:25:08.005Z"
+  },
+  {
+    "id": 2,
+    "orderNumber": "ORD-20251014-93633",
+    "status": "CANCELADO",
+    "items": [
+      {
+        "price": 2500000,
+        "quantity": 2,
+        "productId": 1
+      }
+    ],
+    "shippingAddress": {
+      "city": "Bogotá",
+      "street": "Carrera 70 #35-10",
+      "state": "Cundinamarca",
+      "postalCode": "110111"
+    },
+    "userId": 1,
+    "createdAt": "2025-10-14T21:32:01.409Z",
+    "updatedAt": "2025-10-14T21:32:01.418Z"
+  },
+  {
+    "id": 3,
+    "orderNumber": "ORD-20251014-63876",
+    "status": "CANCELADO",
+    "items": [
+      {
+        "quantity": 2,
+        "productId": 1,
+        "price": 2500000
+      }
+    ],
+    "shippingAddress": {
+      "postalCode": "110111",
+      "state": "Cundinamarca",
+      "street": "Carrera 70 #35-10",
+      "city": "Bogotá"
+    },
+    "userId": 2,
+    "createdAt": "2025-10-14T21:32:14.557Z",
+    "updatedAt": "2025-10-14T21:32:14.566Z"
+  },
+  {
+    "id": 4,
+    "orderNumber": "ORD-20251014-98549",
+    "status": "CANCELADO",
+    "shippingAddress": {
+      "postalCode": "110111",
+      "city": "Bogotá",
+      "state": "Cundinamarca",
+      "street": "Carrera 70 #35-10"
+    },
+    "userId": 2,
+    "items": [
+      {
+        "price": 2500000,
+        "productId": 1,
+        "quantity": 2
+      }
+    ],
+    "createdAt": "2025-10-14T21:33:41.791Z",
+    "updatedAt": "2025-10-14T21:33:41.801Z"
+  },
+  {
+    "id": 5,
+    "orderNumber": "ORD-20251017-54982",
+    "status": "PENDIENTE",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 1,
+        "unitPrice": 300000
+      },
+      {
+        "productId": 2,
+        "quantity": 2,
+        "unitPrice": 250000
+      }
+    ],
+    "shippingAddress": {
+      "street": "Carrera 70 #35-10",
+      "city": "Bogotá",
+      "state": "Cundinamarca",
+      "postalCode": "110111"
+    },
+    "paymentMethod": "credit_card",
+    "createdAt": "2025-10-17T21:06:19.285Z"
+  },
+  {
+    "id": 6,
+    "orderNumber": "ORD-20251017-11125",
+    "status": "PENDIENTE",
+    "userId": 1,
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 1,
+        "unitPrice": 300000
+      },
+      {
+        "productId": 2,
+        "quantity": 2,
+        "unitPrice": 250000
+      }
+    ],
+    "shippingAddress": {
+      "street": "Carrera 70 #35-10",
+      "city": "Bogotá",
+      "state": "Cundinamarca",
+      "postalCode": "110111"
+    },
+    "paymentMethod": "credit_card",
+    "createdAt": "2025-10-17T21:06:27.255Z"
+  },
+  {
+    "id": 7,
+    "orderNumber": "ORD-20251017-74681",
+    "status": "PENDIENTE",
+    "userId": 3,
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 2,
+        "price": 7500000
+      },
+      {
+        "productId": 2,
+        "quantity": 1,
+        "price": 750000
+      }
+    ],
+    "shippingAddress": {
+      "street": "Carrera 70 #35-10",
+      "city": "Bogotá",
+      "state": "Cundinamarca",
+      "postalCode": "110111"
+    },
+    "createdAt": "2025-10-17T21:09:22.069Z"
+  },
+  {
+    "id": 8,
+    "orderNumber": "ORD-20251017-62641",
+    "status": "PENDIENTE",
+    "userId": 3,
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 2,
+        "price": 7500000
+      },
+      {
+        "productId": 2,
+        "quantity": 1,
+        "price": 750000
+      }
+    ],
+    "shippingAddress": {
+      "street": "Carrera 70 #35-10",
+      "city": "Bogotá",
+      "state": "Cundinamarca",
+      "postalCode": "110111"
+    },
+    "createdAt": "2025-10-17T21:11:11.950Z"
+  }
+]

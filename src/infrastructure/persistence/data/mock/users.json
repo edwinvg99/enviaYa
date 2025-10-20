@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1,
+    "email": "admin@enviaya.com",
+    "password": "$2a$10$iZQ.KIt9Os/OSxOZt2sNyuTXE9SdPFrh1BB.L7XNuXw/3VWAHZdbe",
+    "name": "Admin EnviaYa",
+    "phone": "+573001234567",
+    "address": {
+      "street": "Calle 50 #45-30",
+      "city": "Medellín",
+      "state": "Antioquia",
+      "postalCode": "050001"
+    },
+    "emailVerified": true,
+    "role": "ADMIN",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+]
