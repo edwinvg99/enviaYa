@@ -1,4 +1,4 @@
-import path from 'path';
+/*import path from 'path';
 import fs from 'fs/promises';
 import { Request, Response } from 'express';
 import { successResponse, errorResponse } from '../../../shared/utils/responses';
@@ -165,4 +165,39 @@ export const createProduct = async (req: Request, res: Response) => {
 	} catch (err: any) {
 		return res.status(500).json(errorResponse(500, 'Error creando producto', err.message));
 	}
+};*/
+
+import { Request, Response } from "express";
+import { ListProductsService } from "../../../domain/products/services/ListProductsService";
+
+const listProductsService = new ListProductsService();
+
+export const getProducts = async (req: Request, res: Response) => {
+	try {
+		const filters = {
+			name: req.query.name,
+			category: req.query.category,
+			minPrice: parseFloat(req.query.minPrice as string),
+			maxPrice: parseFloat(req.query.maxPrice as string),
+		};
+
+		const page = parseInt(req.query.page as string) || 1;
+		const limit = parseInt(req.query.limit as string) || 10;
+
+		const products = await listProductsService.execute(filters, page, limit);
+
+		return res.json({
+			page: products.page,
+			limit: products.limit,
+			total: products.total,
+			data: products.data,
+		});
+
+
+	} catch (error: any) {
+		console.error("Error al listar productos:", error);
+		return res.status(500).json({ message: "Error interno del servidor" });
+	}
 };
+
+

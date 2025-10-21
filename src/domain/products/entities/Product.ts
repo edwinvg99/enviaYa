@@ -1,15 +1,12 @@
 // Entidad de dominio: Product
-export interface Product {
-  id: number;
+export interface IProduct {
   name: string;
-  sku: string;
   description: string;
   price: number;
   stock: number;
-  categoryId: number;
-  active: boolean;
-  images: string[];
-  weight: number;
-  createdAt: Date;
-  updatedAt: Date;
+  category?: string;
+  image: string;
+  isActive: boolean;
+  isDiscontinued?: boolean;
 }
+
