@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import { RegisterUserService } from '../../../domain/users/services/RegisterUserService';
 import { LoginUser } from '../../../application/users/use-cases/loginUser';
-import { UserModel } from '../../../infrastructure/persistence/data/mock/models/UserModel'; // necesario para verificar token
+import { UserModel } from '../../persistence/data/models/UserModel'; // necesario para verificar token
 
 const registerUserService = new RegisterUserService();
 const loginUserService = new LoginUser();
 
-// 👉 Controlador para registrar usuario
 export const registerUser = async (req: Request, res: Response) => {
   try {
     const user = await registerUserService.execute(req.body);
@@ -19,7 +18,6 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-// 👉 Controlador para iniciar sesión
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -52,7 +50,7 @@ export const verifyUserEmail = async (req: Request, res: Response) => {
     await user.save();
 
     res.status(200).json({
-      message: '✅ Cuenta verificada correctamente. Ya puedes iniciar sesión.',
+      message: ' Cuenta verificada correctamente. Ya puedes iniciar sesión.',
     });
   } catch (error) {
     console.error('Error al verificar email:', error);

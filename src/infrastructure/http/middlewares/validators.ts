@@ -11,6 +11,7 @@ export const validateUser = (
     password: Joi.string().min(8).required(),
     name: Joi.string().min(3).required(),
     phone: Joi.string().pattern(/^\+57\d{10}$/).required(),
+    role: Joi.string().valid('USER', 'ADMIN', 'VENDOR').default('USER'),
     address: Joi.object({
       street: Joi.string().required(),
       city: Joi.string().required(),
@@ -19,7 +20,10 @@ export const validateUser = (
     }).required()
   });
 
-  const { error } = schema.validate(req.body);
+  const { error, value } = schema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true
+  });
   
   if (error) {
     return res.status(400).json({
@@ -35,5 +39,7 @@ export const validateUser = (
     });
   }
   
+  req.body = value;
+
   next();
 };

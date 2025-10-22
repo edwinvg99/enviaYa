@@ -1,106 +1,118 @@
-import path from 'path';
-import fs from 'fs/promises';
 import { Request, Response } from 'express';
+import { ShipmentRepositoryMongo } from '../../persistence/mongo/repositories/ShipmentRepositoryMongo';
+import { CreateShipmentUseCase } from '../../../application/shipments/use-cases/CreateShipmentUseCase';
+import { UpdateShipmentStatusUseCase } from '../../../application/shipments/use-cases/UpdateShipmentStatusUseCase';
+import { MarkOverdueShipmentsAsLostUseCase } from '../../../application/shipments/use-cases/MarkOverdueShipmentsAsLostUseCase';
 import { successResponse, errorResponse } from '../../../shared/utils/responses';
 
-const shipmentsPath = path.join(__dirname, '..', '..', 'persistence', 'data', 'mock', 'shipments.json');
-
-export const getAllShipments = async (req: Request, res: Response) => {
+export const getShipments = async (req: Request, res: Response) => {
   try {
-    const raw = await fs.readFile(shipmentsPath, 'utf-8');
-    const shipments = JSON.parse(raw) as any[];
+    const shipmentRepository = new ShipmentRepositoryMongo();
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const filters = req.query;
+
+    const shipments = await shipmentRepository.findAll(filters, page, limit);
     
-    const { userId, status } = req.query;
-    let result = shipments;
-    
-    if (userId) {
-      result = result.filter(s => s.userId === Number(userId));
-    }
-    
-    if (status) {
-      result = result.filter(s => s.status === status);
-    }
-    
-    return res.json(successResponse(result));
-  } catch (err: any) {
-    return res.status(500).json(errorResponse(500, 'Error leyendo envíos', err.message));
+    res.json(successResponse(200, 'Envíos obtenidos exitosamente', shipments));
+  } catch (error) {
+    res.status(500).json(errorResponse(500, 'Error al obtener envíos', error));
   }
 };
 
 export const getShipmentById = async (req: Request, res: Response) => {
   try {
-    const raw = await fs.readFile(shipmentsPath, 'utf-8');
-    const shipments = JSON.parse(raw) as any[];
-    const id = Number(req.params.id);
-    
-    if (Number.isNaN(id)) {
-      return res.status(400).json(errorResponse(400, 'El id debe ser numérico'));
-    }
-    
-    const shipment = shipments.find(s => s.id === id);
+    const shipmentRepository = new ShipmentRepositoryMongo();
+    const shipment = await shipmentRepository.findById(req.params.id);
     
     if (!shipment) {
       return res.status(404).json(errorResponse(404, 'Envío no encontrado'));
     }
     
-    return res.json(successResponse(shipment));
-  } catch (err: any) {
-    return res.status(500).json(errorResponse(500, 'Error leyendo envío', err.message));
+    res.json(successResponse(200, 'Envío obtenido exitosamente', shipment));
+  } catch (error) {
+    res.status(500).json(errorResponse(500, 'Error al obtener envío', error));
   }
 };
 
 export const getShipmentByTracking = async (req: Request, res: Response) => {
   try {
-    const raw = await fs.readFile(shipmentsPath, 'utf-8');
-    const shipments = JSON.parse(raw) as any[];
-    const tracking = req.params.trackingNumber;
-    const s = shipments.find(sh => sh.trackingNumber === tracking);
-    if (!s) return res.status(404).json(errorResponse(404, 'Envío no encontrado'));
-    return res.json(successResponse(s));
-  } catch (err: any) {
-    return res.status(500).json(errorResponse(500, 'Error leyendo envíos', err.message));
+    const shipmentRepository = new ShipmentRepositoryMongo();
+    const shipment = await shipmentRepository.findByTrackingNumber(req.params.trackingNumber);
+    
+    if (!shipment) {
+      return res.status(404).json(errorResponse(404, 'Envío no encontrado'));
+    }
+    
+    res.json(successResponse(200, 'Envío obtenido exitosamente', shipment));
+  } catch (error) {
+    res.status(500).json(errorResponse(500, 'Error al obtener envío', error));
   }
 };
 
-export const getShipmentByIdWithStatus = async (req: Request, res: Response) => {
+export const createShipment = async (req: Request, res: Response) => {
   try {
-    const raw = await fs.readFile(shipmentsPath, 'utf-8');
-    const shipments = JSON.parse(raw) as any[];
-    const id = Number(req.params.id);
-    const status = String(req.params.status || '');
-
-    if (Number.isNaN(id)) {
-      return res.status(400).json(errorResponse(400, 'El id debe ser numérico'));
-    }
-
-    const shipment = shipments.find(s => s.id === id && s.status === status);
-    if (!shipment) return res.status(404).json(errorResponse(404, 'Envío no encontrado con el estado solicitado'));
-    return res.json(successResponse(shipment));
-  } catch (err: any) {
-    return res.status(500).json(errorResponse(500, 'Error leyendo envío', err.message));
+    const createShipmentUseCase = new CreateShipmentUseCase();
+    const shipment = await createShipmentUseCase.execute(req.body.orderId);
+    
+    res.status(201).json(successResponse(201, 'Envío creado exitosamente', shipment));
+  } catch (error) {
+    res.status(400).json(errorResponse(400, 'Error al crear envío', error));
   }
 };
 
 export const updateShipmentStatus = async (req: Request, res: Response) => {
   try {
-    const raw = await fs.readFile(shipmentsPath, 'utf-8');
-    const shipments = JSON.parse(raw) as any[];
-    const id = Number(req.params.id);
-    const idx = shipments.findIndex(s => s.id === id);
-    if (idx === -1) return res.status(404).json(errorResponse(404, 'Envío no encontrado'));
-    const { status, location, description } = req.body;
+    const updateShipmentStatusUseCase = new UpdateShipmentStatusUseCase();
+    const userRole = req.user?.role || 'USER';
+    const { status, location, description, carrierTrackingNumber } = req.body;
     
-    const current = shipments[idx].status;
-    if (current === 'EN_ENTREGA' && status === 'PENDIENTE') {
-      return res.status(422).json(errorResponse(422, 'No se puede retroceder a estados anteriores', { currentStatus: current, attemptedStatus: status }));
-    }
-    const historyEntry = { status, location, description, timestamp: new Date().toISOString() };
-    shipments[idx].status = status;
-    shipments[idx].history = shipments[idx].history ? [...shipments[idx].history, historyEntry] : [historyEntry];
-    shipments[idx].updatedAt = new Date().toISOString();
-    await fs.writeFile(shipmentsPath, JSON.stringify(shipments, null, 2), 'utf-8');
-    return res.json(successResponse({ id: shipments[idx].id, trackingNumber: shipments[idx].trackingNumber, status: shipments[idx].status, history: [historyEntry] }, 'Estado de envío actualizado exitosamente'));
-  } catch (err: any) {
-    return res.status(500).json(errorResponse(500, 'Error actualizando estado', err.message));
+    const shipment = await updateShipmentStatusUseCase.execute(
+      req.params.id, 
+      status, 
+      location, 
+      description, 
+      userRole,
+      carrierTrackingNumber
+    );
+    
+    res.json(successResponse(200, 'Estado de envío actualizado exitosamente', shipment));
+  } catch (error) {
+    res.status(400).json(errorResponse(400, 'Error al actualizar estado de envío', error));
+  }
+};
+
+export const getShipmentsByStatus = async (req: Request, res: Response) => {
+  try {
+    const shipmentRepository = new ShipmentRepositoryMongo();
+    const shipments = await shipmentRepository.findByStatus(req.params.status);
+    
+    res.json(successResponse(200, 'Envíos obtenidos exitosamente', shipments));
+  } catch (error) {
+    res.status(500).json(errorResponse(500, 'Error al obtener envíos', error));
+  }
+};
+
+export const getUserShipments = async (req: Request, res: Response) => {
+  try {
+    const shipmentRepository = new ShipmentRepositoryMongo();
+    const userId = req.user?.id || req.params.userId;
+    
+    const shipments = await shipmentRepository.findByUserId(userId);
+    
+    res.json(successResponse(200, 'Envíos del usuario obtenidos exitosamente', shipments));
+  } catch (error) {
+    res.status(500).json(errorResponse(500, 'Error al obtener envíos del usuario', error));
+  }
+};
+
+export const markOverdueAsLost = async (req: Request, res: Response) => {
+  try {
+    const markOverdueUseCase = new MarkOverdueShipmentsAsLostUseCase();
+    const processedCount = await markOverdueUseCase.execute();
+    
+    res.json(successResponse(200, `Se marcaron ${processedCount} envíos como perdidos`));
+  } catch (error) {
+    res.status(500).json(errorResponse(500, 'Error al procesar envíos vencidos', error));
   }
 };

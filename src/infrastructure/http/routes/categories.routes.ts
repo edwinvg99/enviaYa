@@ -1,10 +1,20 @@
-// Rutas de categorías
 import { Router } from 'express';
-import { getAllCategories, getCategoryById } from '../controllers/categories.controller';
+import { 
+  getCategories, 
+  getCategoryById, 
+  createCategory, 
+  updateCategory, 
+  deleteCategory 
+} from '../controllers/categories.controller';
+import { authenticate, authorizeRoles } from '../middlewares/auth';
 
 const router = Router();
 
-router.get('/', getAllCategories);
+router.get('/', getCategories);
 router.get('/:id', getCategoryById);
+
+router.post('/', authenticate, authorizeRoles('ADMIN'), createCategory);
+router.put('/:id', authenticate, authorizeRoles('ADMIN'), updateCategory);
+router.delete('/:id', authenticate, authorizeRoles('ADMIN'), deleteCategory);
 
 export default router;

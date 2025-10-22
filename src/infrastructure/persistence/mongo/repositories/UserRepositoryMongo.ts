@@ -1,11 +1,35 @@
-import { UserModel } from '../../data/mock/models/UserModel';
+import { UserModel } from '../../data/models/UserModel';
 import { IUser } from '../../../../domain/users/entities/User';
 
 export class UserRepositoryMongo {
+  // Buscar usuario por ID
+  async findById(id: string): Promise<IUser | null> {
+    try {
+      const user = await UserModel.findById(id).lean();
+      if (!user) return null;
+      
+      // Convertir ObjectId a string para cumplir con IUser
+      return {
+        ...user,
+        _id: user._id.toString()
+      } as IUser;
+    } catch (error) {
+      console.error('Error en findById:', error);
+      return null;
+    }
+  }
+
   // Buscar usuario por email (usado para login o registro)
   async findByEmail(email: string): Promise<IUser | null> {
     try {
-      return await UserModel.findOne({ email }).lean(); // lean() devuelve un objeto plano
+      const user = await UserModel.findOne({ email }).lean();
+      if (!user) return null;
+      
+      // Convertir ObjectId a string para cumplir con IUser
+      return {
+        ...user,
+        _id: user._id.toString()
+      } as IUser;
     } catch (error) {
       console.error('Error en findByEmail:', error);
       throw new Error('Error al buscar el usuario en la base de datos');

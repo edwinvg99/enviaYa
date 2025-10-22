@@ -1,12 +1,25 @@
 import sgMail from "@sendgrid/mail";
 
 export class SendGridEmailService {
+  private isConfigured: boolean = false;
+
   constructor() {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+    const apiKey = process.env.SENDGRID_API_KEY;
+    if (apiKey && apiKey.trim() !== '') {
+      sgMail.setApiKey(apiKey);
+      this.isConfigured = true;
+    } else {
+      console.warn('  SENDGRID_API_KEY no configurada. Los emails no se enviarán.');
+    }
   }
 
   async sendVerificationEmail(to: string, name: string, token: string) {
-    const link = `${process.env.APP_URL}/api/v1/users/verify?token=${token}`;
+    if (!this.isConfigured) {
+      console.log(` [SIMULADO] Email de verificación para ${to} con token: ${token}`);
+      return;
+    }
+
+    const link = `${process.env.BASE_URL}/api/v1/users/verify?token=${token}`;
 
     const msg = {
       to,

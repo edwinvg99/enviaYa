@@ -1,53 +1,79 @@
-import path from 'path';
-import fs from 'fs/promises';
 import { Request, Response } from 'express';
+import { CategoryRepositoryMongo } from '../../persistence/mongo/repositories/CategoryRepositoryMongo';
+import { CreateCategoryUseCase } from '../../../application/categories/use-cases/CreateCategoryUseCase';
+import { UpdateCategoryUseCase } from '../../../application/categories/use-cases/UpdateCategoryUseCase';
+import { DeleteCategoryUseCase } from '../../../application/categories/use-cases/DeleteCategoryUseCase';
 import { successResponse, errorResponse } from '../../../shared/utils/responses';
 
-const categoriesPath = path.join(__dirname, '..', '..', 'persistence', 'data', 'mock', 'categories.json');
-
-type Category = {
-  id: number;
-  name: string;
-  description: string;
-  active: boolean;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-};
-
-export const getAllCategories = async (req: Request, res: Response) => {
+export const getCategories = async (req: Request, res: Response) => {
   try {
-    const raw = await fs.readFile(categoriesPath, 'utf-8');
-    const categories = JSON.parse(raw) as Category[];
-
-    const activeOnly = req.query.active === 'true';
-    const result = activeOnly 
-      ? categories.filter(c => c.active)
-      : categories;
-
-    return res.json(successResponse(result));
-  } catch (err: any) {
-    return res.status(500).json(errorResponse(500, 'Error leyendo categorías', err.message));
+    const categoryRepository = new CategoryRepositoryMongo();
+    const categories = await categoryRepository.findAll();
+    
+    res.json(successResponse(200, 'Categorías obtenidas exitosamente', categories));
+  } catch (error) {
+    res.status(500).json(errorResponse(500, 'Error al obtener categorías', error));
   }
 };
 
 export const getCategoryById = async (req: Request, res: Response) => {
   try {
-    const raw = await fs.readFile(categoriesPath, 'utf-8');
-    const categories = JSON.parse(raw) as Category[];
-    const id = Number(req.params.id);
-    
-    if (Number.isNaN(id)) {
-      return res.status(400).json(errorResponse(400, 'El id debe ser numérico'));
-    }
-
-    const category = categories.find(c => c.id === id);
+    const categoryRepository = new CategoryRepositoryMongo();
+    const category = await categoryRepository.findById(req.params.id);
     
     if (!category) {
-      return res.status(404).json(errorResponse(404, `Categoría con id ${id} no encontrada`));
+      return res.status(404).json(errorResponse(404, 'Categoría no encontrada'));
     }
+    
+    res.json(successResponse(200, 'Categoría obtenida exitosamente', category));
+  } catch (error) {
+    res.status(500).json(errorResponse(500, 'Error al obtener categoría', error));
+  }
+};
 
-    return res.json(successResponse(category));
-  } catch (err: any) {
-    return res.status(500).json(errorResponse(500, 'Error leyendo categoría', err.message));
+export const createCategory = async (req: Request, res: Response) => {
+  try {
+    const createCategoryUseCase = new CreateCategoryUseCase();
+    const userRole = req.user!.role;
+    
+    const category = await createCategoryUseCase.execute(req.body, userRole);
+    
+    res.status(201).json(successResponse(201, 'Categoría creada exitosamente', category));
+  } catch (error) {
+    res.status(400).json(errorResponse(400, 'Error al crear categoría', error));
+  }
+};
+
+export const updateCategory = async (req: Request, res: Response) => {
+  try {
+    const updateCategoryUseCase = new UpdateCategoryUseCase();
+    const userRole = req.user!.role;
+    
+    const category = await updateCategoryUseCase.execute(req.params.id, req.body, userRole);
+    
+    if (!category) {
+      return res.status(404).json(errorResponse(404, 'Categoría no encontrada'));
+    }
+    
+    res.json(successResponse(200, 'Categoría actualizada exitosamente', category));
+  } catch (error) {
+    res.status(400).json(errorResponse(400, 'Error al actualizar categoría', error));
+  }
+};
+
+export const deleteCategory = async (req: Request, res: Response) => {
+  try {
+    const deleteCategoryUseCase = new DeleteCategoryUseCase();
+    const userRole = req.user!.role;
+    
+    const deleted = await deleteCategoryUseCase.execute(req.params.id, userRole);
+    
+    if (!deleted) {
+      return res.status(404).json(errorResponse(404, 'Categoría no encontrada'));
+    }
+    
+    res.json(successResponse(200, 'Categoría eliminada exitosamente'));
+  } catch (error) {
+    res.status(400).json(errorResponse(400, 'Error al eliminar categoría', error));
   }
 };

@@ -1,19 +1,20 @@
 // Entidad de dominio: Notification
 export interface Notification {
-  id: number;
-  userId: number;
+  _id?: string;
+  userId: string;
   type: NotificationType;
   title: string;
   message: string;
-  read: boolean;
-  relatedEntityId: number | null;
-  relatedEntityType: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  isRead: boolean;
+  relatedEntityId?: string | null;
+  relatedEntityType?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type NotificationType = 
   | 'ORDER_STATUS'
+  | 'ORDER_CANCELLED'
   | 'SHIPMENT_UPDATE'
   | 'PROMOTION'
   | 'SYSTEM'

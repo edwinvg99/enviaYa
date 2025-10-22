@@ -1,9 +1,9 @@
 // Entidad de dominio: Category
 export interface Category {
-  id: number;
+  _id?: string;
   name: string;
   description: string;
   active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

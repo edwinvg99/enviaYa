@@ -1,11 +1,16 @@
-// Rutas de notificaciones
 import { Router } from 'express';
-import { getNotifications, getNotificationById, markAsRead } from '../controllers/notifications.controller';
+import { 
+  getUserNotifications, 
+  markNotificationAsRead, 
+  markAllNotificationsAsRead,
+  deleteNotification
+} from '../controllers/notifications.controller';
 
 const router = Router();
 
-router.get('/', getNotifications);
-router.get('/:id', getNotificationById);
-router.put('/:id/read', markAsRead);
+router.get('/user/:userId', getUserNotifications);
+router.patch('/:id/read', markNotificationAsRead);
+router.patch('/user/:userId/read-all', markAllNotificationsAsRead);
+router.delete('/:id', deleteNotification);
 
 export default router;

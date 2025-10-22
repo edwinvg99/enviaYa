@@ -2,9 +2,9 @@
 import { Address } from '../../shared/value-objects/Address';
 
 export interface Order {
-  id: number;
+  _id?: string;
   orderNumber: string;
-  userId: number;
+  userId: string;
   status: OrderStatus;
   items: OrderItem[];
   subtotal?: number;
@@ -12,12 +12,14 @@ export interface Order {
   total?: number;
   shippingAddress: Address;
   paymentMethod?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  paymentStatus?: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+  notes?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface OrderItem {
-  productId: number;
+  productId: string;
   quantity: number;
   unitPrice?: number;
   price?: number;

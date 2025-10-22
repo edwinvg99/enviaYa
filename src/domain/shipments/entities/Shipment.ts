@@ -2,18 +2,21 @@
 import { Address } from '../../shared/value-objects/Address';
 
 export interface Shipment {
-  id: number;
-  orderId: number;
-  userId: number;
+  _id?: string;
+  orderId: string;
+  userId: string;
   trackingNumber: string;
   status: ShipmentStatus;
   currentLocation: string;
   estimatedDelivery: Date;
+  actualDelivery?: Date;
   history: ShipmentHistory[];
   carrier: string;
+  carrierTrackingNumber?: string;
   shippingAddress: Address;
-  createdAt: Date;
-  updatedAt: Date;
+  notes?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface ShipmentHistory {
@@ -25,8 +28,10 @@ export interface ShipmentHistory {
 
 export type ShipmentStatus = 
   | 'PENDIENTE'
+  | 'PREPARANDO'
   | 'EN_TRANSITO'
   | 'EN_ENTREGA'
   | 'ENTREGADO'
   | 'DEVUELTO'
-  | 'CANCELADO';
+  | 'CANCELADO'
+  | 'PERDIDO';

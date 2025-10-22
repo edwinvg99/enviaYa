@@ -1,4 +1,4 @@
-import { ProductModel } from "../../../infrastructure/persistence/data/mock/models/ProductModel";
+import { ProductModel } from "../../../infrastructure/persistence/data/models/ProductModel";
 
 
 export class ListProductsService {

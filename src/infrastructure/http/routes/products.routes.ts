@@ -1,11 +1,22 @@
-// Rutas de productos
 import { Router } from 'express';
-import { getProducts} from '../controllers/products.controller';
+import { 
+  getProducts, 
+  getProductById, 
+  createProduct, 
+  updateProduct, 
+  deleteProduct, 
+  updateStock 
+} from '../controllers/products.controller';
+import { authenticate, authorizeRoles } from '../middlewares/auth';
 
 const router = Router();
 
 router.get('/', getProducts);
-/*outer.post('/', createProduct);
-router.get('/:id', getProductById);*/
+router.get('/:id', getProductById);
+
+router.post('/', authenticate, authorizeRoles('ADMIN'), createProduct);
+router.put('/:id', authenticate, authorizeRoles('ADMIN'), updateProduct);
+router.delete('/:id', authenticate, authorizeRoles('ADMIN'), deleteProduct);
+router.patch('/:id/stock', authenticate, authorizeRoles('ADMIN', 'VENDOR'), updateStock);
 
 export default router;
