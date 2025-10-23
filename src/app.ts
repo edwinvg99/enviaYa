@@ -7,6 +7,8 @@ import ordersRouter from './infrastructure/http/routes/orders.routes';
 import shipmentsRouter from './infrastructure/http/routes/shipments.routes';
 import suppliersRouter from './infrastructure/http/routes/suppliers.routes';
 import notificationsRouter from './infrastructure/http/routes/notifications.routes';
+import cartRoutes from './infrastructure/http/routes/cart.routes';
+import checkoutRoutes from "./infrastructure/http/routes/checkout.routes";
 import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
 import { loggerMiddleware } from './infrastructure/http/middlewares/logger';
 import { config } from './infrastructure/config/environment';
@@ -40,6 +42,8 @@ app.use(`${API_BASE}/orders`, ordersRouter);
 app.use(`${API_BASE}/shipments`, shipmentsRouter);
 app.use(`${API_BASE}/suppliers`, suppliersRouter);
 app.use(`${API_BASE}/notifications`, notificationsRouter);
+app.use(`${API_BASE}/cart`, cartRoutes);
+app.use(`${API_BASE}/checkout`, checkoutRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });

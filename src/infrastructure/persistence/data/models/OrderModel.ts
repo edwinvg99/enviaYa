@@ -1,5 +1,5 @@
-import { Schema, model, Types } from 'mongoose';
-import { Order, OrderItem } from '../../../../domain/orders/entities/Order';
+import { Schema, model } from 'mongoose';
+import { Order } from '../../../../domain/orders/entities/Order';
 
 const OrderItemSchema = new Schema({
   productId: { type: String, required: true },
@@ -9,16 +9,17 @@ const OrderItemSchema = new Schema({
   subtotal: { type: Number, required: true, min: 0 }
 });
 
+// 👇 Asegúrate de definir OrderSchema DESPUÉS de OrderItemSchema
 const OrderSchema = new Schema<Order>(
   {
     orderNumber: { type: String, required: true, unique: true },
     userId: { type: String, required: true },
-    status: { 
-      type: String, 
+    status: {
+      type: String,
       enum: ['PENDIENTE', 'PREPARANDO', 'EN_TRANSITO', 'EN_ENTREGA', 'ENTREGADO', 'CANCELADO'],
       default: 'PENDIENTE'
     },
-    items: [OrderItemSchema],
+    items: [OrderItemSchema], // 👈 ya existe, ahora sí funciona
     subtotal: { type: Number, required: true, min: 0 },
     shippingCost: { type: Number, default: 0, min: 0 },
     total: { type: Number, required: true, min: 0 },
@@ -30,16 +31,18 @@ const OrderSchema = new Schema<Order>(
       country: { type: String, required: true }
     },
     paymentMethod: { type: String },
-    paymentStatus: { 
-      type: String, 
+    paymentStatus: {
+      type: String,
       enum: ['PENDING', 'PAID', 'FAILED', 'REFUNDED'],
       default: 'PENDING'
     },
-    notes: { type: String }
+    notes: { type: String },
+    shippingMethod: { type: String, enum: ['standard', 'express'], default: 'standard' },
+    orderConfirmed: { type: Boolean, default: false }
   },
-  {
-    timestamps: true
-  }
+  { timestamps: true }
 );
 
 export const OrderModel = model<Order>('Order', OrderSchema);
+
+
