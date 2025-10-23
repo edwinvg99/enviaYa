@@ -9,18 +9,18 @@ export class CheckoutService {
   private orderRepo = new OrderRepositoryMongo();
 
   async execute(userId: string, shippingData: any, paymentMethod: string): Promise<Order> {
-    // 1️⃣ Obtener carrito
+    // Obtener carrito
     const cart = await this.cartRepo.findByUserId(userId);
     if (!cart || cart.items.length === 0) {
       throw new Error("El carrito está vacío o no existe.");
     }
 
-    // 2️⃣ Verificar expiración
+    // Verificar expiración
     if (cart.expiresAt < new Date()) {
       throw new Error("El carrito ha expirado. Por favor, agrega los productos nuevamente.");
     }
 
-    // 3️⃣ Verificar stock
+    // Verificar stock
     for (const item of cart.items) {
       const product = await ProductModel.findById(item.productId);
       if (!product || product.stock < item.quantity) {
@@ -28,18 +28,18 @@ export class CheckoutService {
       }
     }
 
-    // 4️⃣ Calcular envío (gratis si total >= 50000)
+    // Calcular envío (gratis si total >= 50000)
     const shippingCost = cart.total >= 50000 ? 0 : 8000;
     const total = cart.total + shippingCost;
 
-    // 5️⃣ Crear número de orden único
+    // Crear número de orden único
     const now = new Date();
     const unique = Math.floor(10000 + Math.random() * 90000);
     const orderNumber = `ORD-${now.getFullYear()}${(now.getMonth() + 1)
       .toString()
       .padStart(2, "0")}${now.getDate().toString().padStart(2, "0")}-${unique}`;
 
-    // 6️⃣ Crear orden
+    // Crear orden
     const newOrder: Order = {
   orderNumber,
   userId,
@@ -62,14 +62,14 @@ export class CheckoutService {
 
     const savedOrder = await this.orderRepo.create(newOrder);
 
-    // 7️⃣ Descontar stock
+    // Descontar stock
     for (const item of cart.items) {
       await ProductModel.findByIdAndUpdate(item.productId, {
         $inc: { stock: -item.quantity },
       });
     }
 
-    // 8️⃣ Limpiar carrito
+    // Limpiar carrito
     await this.cartRepo.clearCart(userId);
 
     return savedOrder;

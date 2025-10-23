@@ -3,7 +3,7 @@ import { Cart } from '../../../../domain/cartUser/entities/Cart';
 
 export interface CartDoc extends Omit<Cart, '_id'>, Document {}
 
-// 🧩 Subdocumento: Items del carrito
+// Items del carrito
 const CartItemSchema = new Schema({
   productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
   name: { type: String, required: true },
@@ -26,7 +26,7 @@ const CartSchema = new Schema<CartDoc>(
   { timestamps: true }
 );
 
-// 🧮 Middleware: recalcular totales automáticamente antes de guardar
+// Middleware: recalcular totales automáticamente antes de guardar
 CartSchema.pre('save', function (next) {
   const cart: any = this;
   cart.total = cart.items.reduce((sum: number, item: any) => sum + item.subtotal, 0);

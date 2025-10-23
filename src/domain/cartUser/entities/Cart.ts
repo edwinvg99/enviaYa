@@ -1,20 +1,20 @@
 export interface CartItem {
   productId: string;
   name: string;
-  price: number;              // Precio congelado
+  price: number;             
   quantity: number;
-  subtotal: number;           // 👈 NUEVO: subtotal por producto
+  subtotal: number;           
   addedAt: Date;
-  priceLockedUntil: Date;     // +2 horas desde que se agrega o actualiza
+  priceLockedUntil: Date;     
 }
 
 export interface Cart {
-  _id?: string;               // ⚙️ Soporte para MongoDB
+  _id?: string;              
   userId: string;
   items: CartItem[];
   total: number;
-  expiresAt: Date;            // +24h sin actividad
-  lastActivity: Date;         // 📆 Actualizado en cada cambio
+  expiresAt: Date;           
+  lastActivity: Date;       
 }
 
 

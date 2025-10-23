@@ -24,7 +24,7 @@ export class SendGridEmailService {
     const msg = {
       to,
       from: process.env.EMAIL_FROM!,
-      subject: "Verifica tu cuenta en EnviaYa 🚀",
+      subject: "Verifica tu cuenta en EnviaYa ",
       html: `
         <h2>¡Hola ${name}!</h2>
         <p>Gracias por registrarte en <b>EnviaYa</b>. Para activar tu cuenta, haz clic en el siguiente enlace:</p>

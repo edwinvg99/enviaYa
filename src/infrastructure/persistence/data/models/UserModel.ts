@@ -14,7 +14,7 @@ interface IUserDoc extends Document<Types.ObjectId, any, IUser> {
     country?: string;
   };
   isVerified: boolean;
-  verificationToken?: string | null;
+  verificationToken?: string | null;  
   role: 'USER' | 'ADMIN' | 'VENDOR';
   createdAt: Date;
   updatedAt: Date;
@@ -22,24 +22,35 @@ interface IUserDoc extends Document<Types.ObjectId, any, IUser> {
 
 export interface IUserModel extends IUserDoc {}
 
-const UserSchema = new Schema<IUserModel>({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  phone: { type: String },
-  address: {
-    street: { type: String },
-    city: { type: String },
-    state: { type: String },
-    zipCode: { type: String },
-    country: { type: String }
+const UserSchema = new Schema<IUserModel>(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    phone: { type: String },
+    address: {
+      street: { type: String },
+      city: { type: String },
+      state: { type: String },
+      zipCode: { type: String },
+      country: { type: String },
+    },
+    // verificación de correo
+    isVerified: { type: Boolean, default: false },
+    verificationToken: { type: String, default: null },
+
+    // rol del usuario
+    role: {
+      type: String,
+      enum: ['USER', 'ADMIN', 'VENDOR'],
+      default: 'USER',
+    },
   },
-  isVerified: { type: Boolean, default: false },
-  verificationToken: { type: String },
-  role: { type: String, enum: ['USER', 'ADMIN', 'VENDOR'], default: 'USER' }
-}, {
-  timestamps: true
-});
+  {
+    timestamps: true,
+  }
+);
 
 export const UserModel = mongoose.model<IUserModel>('User', UserSchema);
+
 

@@ -18,7 +18,7 @@ export class RegisterUserService {
       throw new Error('El usuario ya existe');
     }
 
-    // 🔐 Generar token de verificación
+    // Generar token de verificación
     const verificationToken = generateVerificationToken();
 
     // Crear usuario con verificación pendiente
@@ -28,7 +28,7 @@ export class RegisterUserService {
       verificationToken,
     });
 
-    // 📩 Enviar correo de verificación
+    // Enviar correo de verificación
     await this.emailService.sendVerificationEmail(
       newUser.email,
       newUser.name,

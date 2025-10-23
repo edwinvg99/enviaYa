@@ -9,7 +9,7 @@ const OrderItemSchema = new Schema({
   subtotal: { type: Number, required: true, min: 0 }
 });
 
-// 👇 Asegúrate de definir OrderSchema DESPUÉS de OrderItemSchema
+
 const OrderSchema = new Schema<Order>(
   {
     orderNumber: { type: String, required: true, unique: true },
@@ -19,7 +19,7 @@ const OrderSchema = new Schema<Order>(
       enum: ['PENDIENTE', 'PREPARANDO', 'EN_TRANSITO', 'EN_ENTREGA', 'ENTREGADO', 'CANCELADO'],
       default: 'PENDIENTE'
     },
-    items: [OrderItemSchema], // 👈 ya existe, ahora sí funciona
+    items: [OrderItemSchema],
     subtotal: { type: Number, required: true, min: 0 },
     shippingCost: { type: Number, default: 0, min: 0 },
     total: { type: Number, required: true, min: 0 },
