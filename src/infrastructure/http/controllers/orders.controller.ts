@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { OrderRepositoryMongo } from '../../persistence/mongo/repositories/OrderRepositoryMongo';
 import { CreateOrderUseCase } from '../../../application/orders/use-cases/CreateOrderUseCase';
 import { CancelOrderUseCase } from '../../../application/orders/use-cases/CancelOrderUseCase';
+import { UpdateOrderStatusUseCase } from '../../../application/orders/use-cases/UpdateOrderStatusUseCase';
 import { AutoCancelPendingOrdersUseCase } from '../../../application/orders/use-cases/AutoCancelPendingOrdersUseCase';
 import { successResponse, errorResponse } from '../../../shared/utils/responses';
 
@@ -93,6 +94,24 @@ export const getUserOrders = async (req: Request, res: Response) => {
     res.json(successResponse(orders, 'Órdenes del usuario obtenidas exitosamente'));
   } catch (error) {
     res.status(500).json(errorResponse(500, 'Error al obtener órdenes del usuario', error));
+  }
+};
+
+export const updateOrderStatus = async (req: Request, res: Response) => {
+  try {
+    const updateOrderStatusUseCase = new UpdateOrderStatusUseCase();
+    const userRole = req.user?.role || 'USER';
+    const { status } = req.body;
+    
+    if (!status) {
+      return res.status(400).json(errorResponse(400, 'El campo status es requerido'));
+    }
+    
+    const updatedOrder = await updateOrderStatusUseCase.execute(req.params.id, status, userRole);
+    
+    res.json(successResponse(updatedOrder, 'Estado de orden actualizado exitosamente'));
+  } catch (error: any) {
+    res.status(400).json(errorResponse(400, 'Error al actualizar estado de orden', error.message || error));
   }
 };
 

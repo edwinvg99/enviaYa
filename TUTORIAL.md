@@ -571,7 +571,72 @@
 
 ---
 
-### 8. Procesar Cancelación Automática (ADMIN)
+### 8. Actualizar Estado de Orden (ADMIN/VENDOR)
+
+**Método:** `PATCH`
+**URL:** `http://localhost:3000/api/v1/orders/ORDER_ID/status`
+
+**Headers:**
+
+```json
+{
+  "Content-Type": "application/json",
+  "x-user-id": "TU_USER_ID",
+  "x-user-role": "ADMIN"
+}
+```
+
+**Body - Cambiar a PREPARANDO:**
+
+```json
+{
+  "status": "PREPARANDO"
+}
+```
+
+**Body - Cambiar a EN_TRANSITO:**
+
+```json
+{
+  "status": "EN_TRANSITO"
+}
+```
+
+**Body - Cambiar a EN_ENTREGA:**
+
+```json
+{
+  "status": "EN_ENTREGA"
+}
+```
+
+**Body - Cambiar a ENTREGADO:**
+
+```json
+{
+  "status": "ENTREGADO"
+}
+```
+
+**Transiciones Válidas:**
+
+- `PENDIENTE` → `PREPARANDO` o `CANCELADO`
+- `PREPARANDO` → `EN_TRANSITO` o `CANCELADO`
+- `EN_TRANSITO` → `EN_ENTREGA` o `CANCELADO`
+- `EN_ENTREGA` → `ENTREGADO` o `CANCELADO`
+- `ENTREGADO` → (estado final)
+- `CANCELADO` → (estado final)
+
+**Validaciones:**
+
+- ✅ Solo ADMIN o VENDOR pueden actualizar
+- ✅ Transiciones secuenciales obligatorias
+- ✅ No se puede cambiar desde ENTREGADO o CANCELADO
+- ✅ Se crea notificación al cliente automáticamente
+
+---
+
+### 9. Procesar Cancelación Automática (ADMIN)
 
 **Método:** `POST`
 **URL:** `http://localhost:3000/api/v1/orders/process-auto-cancel`
@@ -929,6 +994,9 @@ PATCH /orders/:id/cancel
 - ✅ Stock se devuelve automáticamente al cancelar
 - ✅ Notificación obligatoria al cancelar
 - ✅ Auto-cancelación después de 48 horas
+- ✅ Solo ADMIN/VENDOR pueden cambiar estado
+- ✅ Transiciones de estado secuenciales obligatorias
+- ✅ Estados finales: ENTREGADO y CANCELADO (no se pueden modificar)
 
 ### Envíos:
 

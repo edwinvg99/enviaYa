@@ -4,6 +4,7 @@ import {
   getOrderById, 
   createOrder, 
   cancelOrder,
+  updateOrderStatus,
   getPendingOrders,
   getOrdersByStatus,
   getUserOrders,
@@ -22,6 +23,7 @@ router.get('/:id', authenticate, getOrderById);
 router.post('/', authenticate, createOrder);
 
 router.patch('/:id/cancel', authenticate, cancelOrder);
+router.patch('/:id/status', authenticate, authorizeRoles('ADMIN', 'VENDOR'), updateOrderStatus);
 
 router.post('/process-auto-cancel', authenticate, authorizeRoles('ADMIN'), processAutoCancelOrders);
 
