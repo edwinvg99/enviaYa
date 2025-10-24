@@ -10,7 +10,7 @@ interface IUserDoc extends Document<Types.ObjectId, any, IUser> {
     street?: string;
     city?: string;
     state?: string;
-    zipCode?: string;
+    postalCode?: string;
     country?: string;
   };
   isVerified: boolean;
@@ -32,14 +32,12 @@ const UserSchema = new Schema<IUserModel>(
       street: { type: String },
       city: { type: String },
       state: { type: String },
-      zipCode: { type: String },
+      postalCode: { type: String },
       country: { type: String },
     },
-    // verificación de correo
     isVerified: { type: Boolean, default: false },
     verificationToken: { type: String, default: null },
 
-    // rol del usuario
     role: {
       type: String,
       enum: ['USER', 'ADMIN', 'VENDOR'],

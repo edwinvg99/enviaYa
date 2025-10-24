@@ -19,7 +19,6 @@ export class UpdateShipmentStatusUseCase {
     userRole: string,
     carrierTrackingNumber?: string
   ): Promise<any> {
-    // Solo administradores y vendedores pueden actualizar estados
     if (!['ADMIN', 'VENDOR'].includes(userRole)) {
       throw new Error('Solo administradores y vendedores pueden actualizar estados de envío');
     }
@@ -29,12 +28,10 @@ export class UpdateShipmentStatusUseCase {
       throw new Error('Envío no encontrado');
     }
 
-    // Validar transición de estado secuencial
     if (!this.isValidStatusTransition(shipment.status, newStatus)) {
       throw new Error(`No se puede cambiar de ${shipment.status} a ${newStatus}`);
     }
 
-    // Validar número de guía único si se proporciona
     if (carrierTrackingNumber) {
       const existingShipment = await this.shipmentRepository.findByCarrierTrackingNumber(carrierTrackingNumber);
       if (existingShipment && existingShipment._id !== shipmentId) {
@@ -42,7 +39,6 @@ export class UpdateShipmentStatusUseCase {
       }
     }
 
-    // Actualizar estado del envío
     const updateData: any = {
       status: newStatus,
       currentLocation: location
@@ -58,7 +54,6 @@ export class UpdateShipmentStatusUseCase {
 
     const updatedShipment = await this.shipmentRepository.update(shipmentId, updateData);
 
-    // Agregar entrada al historial
     await this.shipmentRepository.addHistoryEntry(shipmentId, {
       status: newStatus,
       location,
@@ -66,7 +61,6 @@ export class UpdateShipmentStatusUseCase {
       timestamp: new Date()
     });
 
-    // Crear notificación al usuario
     await this.notificationRepository.create({
       userId: shipment.userId,
       title: 'Actualización de Envío',

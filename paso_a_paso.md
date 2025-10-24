@@ -193,7 +193,7 @@
     "street": "Av. Cra 15 #100-50",
     "city": "Bogotá",
     "state": "Cundinamarca",
-    "zipCode": "110111",
+    "postalCode": "110111",
     "country": "Colombia"
   },
   "contactPerson": "Juan Pérez",
@@ -441,7 +441,7 @@
     "street": "Calle 123 #45-67",
     "city": "Bogotá",
     "state": "Cundinamarca",
-    "zipCode": "110111",
+    "postalCode": "110111",
     "country": "Colombia"
   },
   "totalAmount": 3198000

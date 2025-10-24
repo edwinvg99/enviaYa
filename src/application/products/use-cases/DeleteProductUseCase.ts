@@ -11,7 +11,6 @@ export class DeleteProductUseCase {
   }
 
   async execute(id: string, userRole: string): Promise<boolean> {
-    // Solo administradores pueden eliminar productos
     if (userRole !== 'ADMIN') {
       throw new Error('Solo los administradores pueden eliminar productos');
     }
@@ -21,7 +20,6 @@ export class DeleteProductUseCase {
       throw new Error('Producto no encontrado');
     }
 
-    // Verificar si el producto tiene órdenes asociadas
     const ordersCount = await this.orderRepository.countOrdersByProduct(id);
     if (ordersCount > 0) {
       throw new Error('No se puede eliminar un producto que tiene órdenes asociadas');

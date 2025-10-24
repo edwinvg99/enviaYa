@@ -8,7 +8,6 @@ export class UpdateStockUseCase {
   }
 
   async execute(id: string, quantity: number, userRole: string): Promise<any> {
-    // Solo administradores y vendedores pueden actualizar stock
     if (!['ADMIN', 'VENDOR'].includes(userRole)) {
       throw new Error('Solo administradores y vendedores pueden actualizar el stock');
     }
@@ -18,7 +17,6 @@ export class UpdateStockUseCase {
       throw new Error('Producto no encontrado');
     }
 
-    // Validar que el stock no sea negativo después de la actualización
     const newStock = existingProduct.stock + quantity;
     if (newStock < 0) {
       throw new Error('El stock no puede ser negativo');

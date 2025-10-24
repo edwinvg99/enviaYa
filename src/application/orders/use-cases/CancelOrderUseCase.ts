@@ -19,28 +19,23 @@ export class CancelOrderUseCase {
       throw new Error('Orden no encontrada');
     }
 
-    // Solo órdenes en estado PENDIENTE pueden cancelarse
     if (order.status !== 'PENDIENTE') {
       throw new Error('Solo las órdenes en estado PENDIENTE pueden cancelarse');
     }
 
-    // Solo administradores, vendedores o el propio usuario pueden cancelar
     if (!['ADMIN', 'VENDOR'].includes(userRole)) {
       throw new Error('No tienes permisos para cancelar esta orden');
     }
 
-    // Actualizar estado de la orden
     await this.orderRepository.update(orderId, { 
       status: 'CANCELADO',
       notes: reason ? `Cancelada: ${reason}` : 'Orden cancelada'
     });
 
-    // Devolver stock automáticamente
     for (const item of order.items) {
       await this.productRepository.updateStock(item.productId, item.quantity);
     }
 
-    // Crear notificación obligatoria al cliente
     await this.notificationRepository.create({
       userId: order.userId,
       title: 'Orden Cancelada',

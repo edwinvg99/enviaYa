@@ -8,7 +8,7 @@ export interface Supplier {
     street: string;
     city: string;
     state: string;
-    zipCode: string;
+    postalCode: string;
     country: string;
   };
   contactPerson: string;

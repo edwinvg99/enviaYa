@@ -3,7 +3,6 @@ import { Cart } from '../../../../domain/cartUser/entities/Cart';
 
 export interface CartDoc extends Omit<Cart, '_id'>, Document {}
 
-// Items del carrito
 const CartItemSchema = new Schema({
   productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
   name: { type: String, required: true },
@@ -11,22 +10,20 @@ const CartItemSchema = new Schema({
   quantity: { type: Number, required: true, min: 1 },
   subtotal: { type: Number, required: true, min: 0 },
   addedAt: { type: Date, default: Date.now },
-  priceLockedUntil: { type: Date, required: true } // precio congelado por 2h
+  priceLockedUntil: { type: Date, required: true } 
 });
 
-// 🛒 Esquema principal del carrito
 const CartSchema = new Schema<CartDoc>(
   {
     userId: { type: String, required: true },
     items: [CartItemSchema],
     total: { type: Number, required: true, default: 0 },
-    expiresAt: { type: Date, required: true }, // expira en 24h sin actividad
+    expiresAt: { type: Date, required: true }, 
     lastActivity: { type: Date, required: true, default: Date.now }
   },
   { timestamps: true }
 );
 
-// Middleware: recalcular totales automáticamente antes de guardar
 CartSchema.pre('save', function (next) {
   const cart: any = this;
   cart.total = cart.items.reduce((sum: number, item: any) => sum + item.subtotal, 0);

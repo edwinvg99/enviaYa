@@ -9,7 +9,6 @@ export class UpdateSupplierUseCase {
   }
 
   async execute(id: string, supplierData: Partial<Supplier>, userRole: string): Promise<Supplier | null> {
-    // Solo administradores pueden actualizar proveedores
     if (userRole?.trim() !== 'ADMIN') {
       throw new Error('Solo los administradores pueden actualizar proveedores');
     }
@@ -19,7 +18,6 @@ export class UpdateSupplierUseCase {
       throw new Error('Proveedor no encontrado');
     }
 
-    // Validar email si se está actualizando
     if (supplierData.email && supplierData.email !== existingSupplier.email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(supplierData.email)) {
@@ -32,7 +30,6 @@ export class UpdateSupplierUseCase {
       }
     }
 
-    // Validar teléfono si se está actualizando
     if (supplierData.phone) {
       const phoneRegex = /^\+57\d{10}$/;
       if (!phoneRegex.test(supplierData.phone)) {
@@ -40,7 +37,6 @@ export class UpdateSupplierUseCase {
       }
     }
 
-    // Validar nombre si se está actualizando
     if (supplierData.name !== undefined) {
       if (!supplierData.name || supplierData.name.trim().length === 0) {
         throw new Error('El nombre del proveedor no puede estar vacío');

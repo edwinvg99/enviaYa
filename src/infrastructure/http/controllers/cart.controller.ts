@@ -4,7 +4,6 @@ import { CartRepositoryMongo } from '../../persistence/mongo/repositories/CartRe
 
 const cartRepo = new CartRepositoryMongo();
 
-// ✅ Añadir producto al carrito
 export const addToCart = async (req: Request, res: Response) => {
   try {
     const userId = req.body.userId || '6732e6f2a45a7a72bc0b1234'; // temporal, cámbialo cuando haya autenticación
@@ -22,7 +21,6 @@ export const addToCart = async (req: Request, res: Response) => {
   }
 };
 
-// ✅ Obtener carrito
 export const getCart = async (req: Request, res: Response) => {
   try {
     const userId = req.query.userId?.toString() || '6732e6f2a45a7a72bc0b1234';
@@ -33,7 +31,6 @@ export const getCart = async (req: Request, res: Response) => {
   }
 };
 
-// ✅ Remover producto
 export const removeFromCart = async (req: Request, res: Response) => {
   try {
     const { productId } = req.body;
@@ -45,7 +42,6 @@ export const removeFromCart = async (req: Request, res: Response) => {
   }
 };
 
-// ✅ Vaciar carrito
 export const clearCart = async (req: Request, res: Response) => {
   try {
     const userId = req.body.userId || '6732e6f2a45a7a72bc0b1234';

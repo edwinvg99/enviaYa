@@ -1,5 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
 import usersRouter from './infrastructure/http/routes/users.routes';
 import productsRouter from './infrastructure/http/routes/products.routes';
 import categoriesRouter from './infrastructure/http/routes/categories.routes';
@@ -34,6 +36,11 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 const API_BASE = `/api/${config.apiVersion}`;
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'EnviaYa API Documentation',
+}));
 
 app.use(`${API_BASE}/users`, usersRouter);
 app.use(`${API_BASE}/products`, productsRouter);

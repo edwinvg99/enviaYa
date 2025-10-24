@@ -1,7 +1,6 @@
 import { IProduct } from "../../../../domain/products/entities/Product";
 import { Schema, model, Document } from 'mongoose';
 
-// Esta interfaz es opcional con Mongoose moderno, pero ayuda si necesitas métodos personalizados
 export interface IProductModel extends Omit<IProduct, '_id'>, Document {}
 
 const ProductSchema = new Schema<IProductModel>({

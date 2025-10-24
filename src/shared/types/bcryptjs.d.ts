@@ -3,7 +3,6 @@ declare module 'bcryptjs' {
   export default bcrypt;
 }
 
-// Extender Request de Express para incluir user
 declare namespace Express {
   export interface Request {
     user?: {

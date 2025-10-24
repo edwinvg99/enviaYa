@@ -2,8 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 // Middleware de autenticación simulado (para desarrollo)
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-  // Por ahora, extraemos el userId y role de los headers
-  // En producción, esto debería validar un JWT
+
   const userId = req.headers['x-user-id'] as string;
   const userRole = req.headers['x-user-role'] as string;
 
@@ -17,7 +16,6 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     });
   }
 
-  // Adjuntar información del usuario a la request
   req.user = {
     _id: userId,
     role: userRole as 'USER' | 'ADMIN' | 'VENDOR'

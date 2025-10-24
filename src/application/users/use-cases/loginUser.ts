@@ -19,11 +19,11 @@ export class LoginUser {
       throw new Error('Usuario no encontrado');
     }
 
-    // Comparar contraseñas directamente (más adelante puedes usar bcrypt)
+    // Comparar contraseas directamente (más adelante puedes usar bcrypt)
     if (user.password !== password) {
       throw new Error('Contraseña incorrecta');
     }
 
-    return user; // Devuelve los datos del usuario autenticado
+    return user; 
   }
 }

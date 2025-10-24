@@ -9,7 +9,6 @@ import { UserModel } from '../../persistence/data/models/UserModel';
 const cartRepo = new CartRepositoryMongo();
 const orderRepo = new OrderRepositoryMongo();
 
-//Costos base
 const SHIPPING_COST = 10000;
 const FREE_SHIPPING_THRESHOLD = 50000;
 
@@ -21,21 +20,18 @@ export const confirmCheckout = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Faltan datos requeridos' });
     }
 
-    // Obtener carrito
     const cart = await cartRepo.findByUserId(userId);
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: 'El carrito está vacío o no existe' });
     }
 
-    // Validar dirección
-    const requiredFields = ['street', 'city', 'state', 'zipCode', 'country'];
+    const requiredFields = ['street', 'city', 'state', 'postalCode', 'country'];
     for (const f of requiredFields) {
       if (!shippingData[f]) {
         return res.status(400).json({ message: `Campo faltante: ${f}` });
       }
     }
 
-    // Verificar stock y calcular totales
     let subtotal = 0;
     for (const item of cart.items) {
       const product = await ProductModel.findById(item.productId);
@@ -53,14 +49,11 @@ export const confirmCheckout = async (req: Request, res: Response) => {
       subtotal += item.price * item.quantity;
     }
 
-    // Calcular envío
     const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
     const total = subtotal + shippingCost;
 
-    // Crear número de orden único
     const orderNumber = `ORD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${uuidv4().slice(0, 5).toUpperCase()}`;
 
-    // Crear orden
     const newOrder = {
       orderNumber,
       userId,
@@ -78,7 +71,7 @@ export const confirmCheckout = async (req: Request, res: Response) => {
         street: shippingData.street,
         city: shippingData.city,
         state: shippingData.state,
-        zipCode: shippingData.zipCode,
+        postalCode: shippingData.postalCode,
         country: shippingData.country
       },
       paymentMethod,
@@ -90,14 +83,12 @@ export const confirmCheckout = async (req: Request, res: Response) => {
 
     const savedOrder = await orderRepo.create(newOrder as any);
 
-    // Descontar stock real
     for (const item of cart.items) {
       await ProductModel.findByIdAndUpdate(item.productId, {
         $inc: { stock: -item.quantity }
       });
     }
 
-    // Limpiar carrito
     await cartRepo.clearCart(userId);
 
     
@@ -131,7 +122,6 @@ export const confirmCheckout = async (req: Request, res: Response) => {
     }
 
 
-    // Respuesta final
     return res.status(201).json({
       message: 'Checkout completado con éxito y correo enviado',
       order: savedOrder

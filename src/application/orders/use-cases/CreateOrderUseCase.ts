@@ -15,16 +15,13 @@ export class CreateOrderUseCase {
   }
 
   async execute(orderData: Order): Promise<Order> {
-    // Validar que el usuario exista
     const user = await this.userRepository.findById(orderData.userId);
     if (!user) {
       throw new Error(`Usuario con ID ${orderData.userId} no encontrado`);
     }
 
-    // Generar número de orden único
     const orderNumber = this.generateOrderNumber();
 
-    // Validar que todos los productos existan y tengan stock suficiente
     for (const item of orderData.items) {
       const product = await this.productRepository.findById(item.productId);
       if (!product) {
@@ -35,7 +32,6 @@ export class CreateOrderUseCase {
       }
     }
 
-    // Calcular totales
     let subtotal = 0;
     for (const item of orderData.items) {
       const product = await this.productRepository.findById(item.productId);
@@ -52,7 +48,6 @@ export class CreateOrderUseCase {
     orderData.orderNumber = orderNumber;
     orderData.status = 'PENDIENTE';
 
-    // Crear la orden
     const order = await this.orderRepository.create(orderData);
 
     // Reducir stock de productos

@@ -9,13 +9,10 @@ const registerUserService = new RegisterUserService();
 const loginUserService = new LoginUser();
 
 
-// ==========================
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    // 1) crear usuario
     const user = await registerUserService.execute(req.body);
 
-    // 2) token 1h
     const token = jwt.sign(
       { email: user.email },
       process.env.JWT_SECRET || 'clave_secreta',
@@ -24,22 +21,20 @@ export const registerUser = async (req: Request, res: Response) => {
 
     await UserModel.findByIdAndUpdate(user._id, { verificationToken: token });
 
-    // 3) link de confirmación
     const confirmationLink =
       `${process.env.BASE_URL}/api/v1/users/verify-email?token=${token}`;
 
-    // 4) enviar email con EmailJS (server-to-server)
     await emailjs.send(
-      process.env.EMAILJS_SERVICE_ID!,         // p.ej. service_abcd123
-      process.env.EMAILJS_TEMPLATE_ID!,        // p.ej. template_qdj8o5q
+      process.env.EMAILJS_SERVICE_ID!,       
+      process.env.EMAILJS_TEMPLATE_ID!,     
       {
-        to_email: user.email,                  // variable del template
-        user_name: user.name ?? 'Usuario',     // opcional
-        confirmation_link: confirmationLink,   // variable del template
+        to_email: user.email,                 
+        user_name: user.name ?? 'Usuario',   
+        confirmation_link: confirmationLink,   
       },
       {
         publicKey: process.env.EMAILJS_PUBLIC_KEY!,
-        privateKey: process.env.EMAILJS_PRIVATE_KEY!, // <– NECESARIO EN BACKEND
+        privateKey: process.env.EMAILJS_PRIVATE_KEY!, 
       }
     );
 
@@ -55,7 +50,6 @@ export const registerUser = async (req: Request, res: Response) => {
 
 
 
-// Inicio de sesión
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
@@ -83,7 +77,6 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 
 
-// Verificación del correo
 
 export const verifyUserEmail = async (req: Request, res: Response) => {
   try {
@@ -110,7 +103,7 @@ export const verifyUserEmail = async (req: Request, res: Response) => {
 
 
     res.status(200).json({
-      message: '✅ Cuenta verificada correctamente. Ya puedes iniciar sesión.',
+      message: ' Cuenta verificada correctamente. Ya puedes iniciar sesión.',
     });
   } catch (error) {
     console.error('Error al verificar email:', error);

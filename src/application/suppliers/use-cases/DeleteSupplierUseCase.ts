@@ -11,7 +11,6 @@ export class DeleteSupplierUseCase {
   }
 
   async execute(id: string, userRole: string): Promise<boolean> {
-    // Solo administradores pueden eliminar proveedores
     if (userRole?.trim() !== 'ADMIN') {
       throw new Error('Solo los administradores pueden eliminar proveedores');
     }
@@ -21,7 +20,6 @@ export class DeleteSupplierUseCase {
       throw new Error('Proveedor no encontrado');
     }
 
-    // Verificar si el proveedor tiene productos asociados
     const productsCount = await this.productRepository.countProductsBySupplier(id);
     if (productsCount > 0) {
       throw new Error('No se puede eliminar un proveedor que tiene productos asociados');

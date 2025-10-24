@@ -12,7 +12,6 @@ export class UpdateProductUseCase {
   }
 
   async execute(id: string, productData: Partial<IProduct>, userRole: string): Promise<IProduct | null> {
-    // Solo administradores pueden actualizar productos
     if (userRole !== 'ADMIN') {
       throw new Error('Solo los administradores pueden actualizar productos');
     }
@@ -22,12 +21,10 @@ export class UpdateProductUseCase {
       throw new Error('Producto no encontrado');
     }
 
-    // Validar que el stock no sea negativo
     if (productData.stock !== undefined && productData.stock < 0) {
       throw new Error('El stock no puede ser negativo');
     }
 
-    // Validar que el precio sea positivo
     if (productData.price !== undefined && productData.price <= 0) {
       throw new Error('El precio debe ser mayor a 0');
     }

@@ -8,7 +8,7 @@ export interface IUser {
     street: string;
     city: string;
     state: string;
-    zipCode: string;
+    postalCode: string;
     country: string;
   };
   isVerified?: boolean;
