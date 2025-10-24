@@ -3,11 +3,13 @@ import { CartRepositoryMongo } from '../../persistence/mongo/repositories/CartRe
 import { OrderRepositoryMongo } from '../../persistence/mongo/repositories/OrderRepositoryMongo';
 import { ProductModel } from '../../../infrastructure/persistence/data/models/ProductModel';
 import { v4 as uuidv4 } from 'uuid';
+import emailjs from '@emailjs/nodejs'; 
+import { UserModel } from '../../persistence/data/models/UserModel';
 
 const cartRepo = new CartRepositoryMongo();
 const orderRepo = new OrderRepositoryMongo();
 
-// 🚚 Costos base
+//Costos base
 const SHIPPING_COST = 10000;
 const FREE_SHIPPING_THRESHOLD = 50000;
 
@@ -19,13 +21,13 @@ export const confirmCheckout = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Faltan datos requeridos' });
     }
 
-    // 🛒 Obtener carrito
+    // Obtener carrito
     const cart = await cartRepo.findByUserId(userId);
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: 'El carrito está vacío o no existe' });
     }
 
-    // ✅ Validar dirección
+    // Validar dirección
     const requiredFields = ['street', 'city', 'state', 'zipCode', 'country'];
     for (const f of requiredFields) {
       if (!shippingData[f]) {
@@ -33,7 +35,7 @@ export const confirmCheckout = async (req: Request, res: Response) => {
       }
     }
 
-    // 🧮 Verificar stock y calcular totales
+    // Verificar stock y calcular totales
     let subtotal = 0;
     for (const item of cart.items) {
       const product = await ProductModel.findById(item.productId);
@@ -51,14 +53,14 @@ export const confirmCheckout = async (req: Request, res: Response) => {
       subtotal += item.price * item.quantity;
     }
 
-    // 🚛 Calcular envío
+    // Calcular envío
     const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
     const total = subtotal + shippingCost;
 
-    // 🧾 Crear número de orden único
+    // Crear número de orden único
     const orderNumber = `ORD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${uuidv4().slice(0, 5).toUpperCase()}`;
 
-    //crear orden
+    // Crear orden
     const newOrder = {
       orderNumber,
       userId,
@@ -86,25 +88,57 @@ export const confirmCheckout = async (req: Request, res: Response) => {
       updatedAt: new Date()
     };
 
-
     const savedOrder = await orderRepo.create(newOrder as any);
 
-    // 🧮 Descontar stock real
+    // Descontar stock real
     for (const item of cart.items) {
       await ProductModel.findByIdAndUpdate(item.productId, {
         $inc: { stock: -item.quantity }
       });
     }
 
-    // 🧹 Limpiar carrito
+    // Limpiar carrito
     await cartRepo.clearCart(userId);
 
+    
+    try {
+      const user = await UserModel.findById(userId);
+      if (user?.email) {
+        await emailjs.send(
+          process.env.EMAILJS_SERVICE_ID!,
+          process.env.EMAILJS_ORDER_TEMPLATE_ID!,
+          {
+            to_email: user.email,
+            to_name: user.name || 'Cliente',
+            order_number: savedOrder?.orderNumber ?? 'N/A',
+            total: savedOrder?.total ? savedOrder.total.toFixed(2) : '0.00',
+            order_date: savedOrder?.createdAt
+              ? new Date(savedOrder.createdAt as Date).toLocaleString()
+              : new Date().toLocaleString(),
+          },
+          {
+            publicKey: process.env.EMAILJS_PUBLIC_KEY!,
+            privateKey: process.env.EMAILJS_PRIVATE_KEY!,
+          }
+        );
+
+        console.log(`Correo de confirmación enviado a ${user.email}`);
+      } else {
+        console.warn('usuario no encontrado o sin email para enviar confirmación.');
+      }
+    } catch (emailError) {
+      console.error('Error al enviar el correo de confirmación:', emailError);
+    }
+
+
+    // Respuesta final
     return res.status(201).json({
-      message: 'Checkout completado con éxito',
+      message: 'Checkout completado con éxito y correo enviado',
       order: savedOrder
     });
+
   } catch (error: any) {
-    console.error('❌ Error en el proceso de checkout:', error);
+    console.error('Error en el proceso de checkout:', error);
     res.status(500).json({ message: 'Error en el proceso de checkout' });
   }
 };

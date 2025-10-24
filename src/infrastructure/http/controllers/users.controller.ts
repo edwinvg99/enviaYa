@@ -54,9 +54,9 @@ export const registerUser = async (req: Request, res: Response) => {
 };
 
 
-// ==========================
-// 🔑 Inicio de sesión
-// ==========================
+
+// Inicio de sesión
+
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -82,9 +82,9 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-// ==========================
-// ✉️ Verificación del correo
-// ==========================
+
+// Verificación del correo
+
 export const verifyUserEmail = async (req: Request, res: Response) => {
   try {
     const { token } = req.query;

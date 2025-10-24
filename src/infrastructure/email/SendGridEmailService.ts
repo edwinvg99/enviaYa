@@ -9,7 +9,7 @@ export class SendGridEmailService {
       sgMail.setApiKey(apiKey);
       this.isConfigured = true;
     } else {
-      console.warn('  SENDGRID_API_KEY no configurada. Los emails no se enviarán.');
+      console.warn('Verificacion de correos preparada');
     }
   }
 

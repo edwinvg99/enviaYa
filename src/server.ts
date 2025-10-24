@@ -17,11 +17,4 @@ app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
   console.log(`Accede a: http://localhost:${PORT}`);
   console.log(`Endpoints disponibles:`);
-  console.log(`   http://localhost:${PORT}/api/v1/users`);
-  console.log(`   http://localhost:${PORT}/api/v1/products`);
-  console.log(`   http://localhost:${PORT}/api/v1/categories`);
-  console.log(`   http://localhost:${PORT}/api/v1/orders`);
-  console.log(`   http://localhost:${PORT}/api/v1/shipments`);
-  console.log(`   http://localhost:${PORT}/api/v1/suppliers`);
-  console.log(`   http://localhost:${PORT}/api/v1/notifications`);
 });
