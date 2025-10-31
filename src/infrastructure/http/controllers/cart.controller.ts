@@ -31,6 +31,9 @@ export const getCart = async (req: Request, res: Response) => {
   }
 };
 
+
+// Remover producto
+
 export const removeFromCart = async (req: Request, res: Response) => {
   try {
     const { productId } = req.body;

@@ -11,6 +11,7 @@ import suppliersRouter from './infrastructure/http/routes/suppliers.routes';
 import notificationsRouter from './infrastructure/http/routes/notifications.routes';
 import cartRoutes from './infrastructure/http/routes/cart.routes';
 import checkoutRoutes from "./infrastructure/http/routes/checkout.routes";
+import adminRoutes from './infrastructure/http/routes/admin.routes';
 import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
 import { loggerMiddleware } from './infrastructure/http/middlewares/logger';
 import { config } from './infrastructure/config/environment';
@@ -51,6 +52,7 @@ app.use(`${API_BASE}/suppliers`, suppliersRouter);
 app.use(`${API_BASE}/notifications`, notificationsRouter);
 app.use(`${API_BASE}/cart`, cartRoutes);
 app.use(`${API_BASE}/checkout`, checkoutRoutes);
+app.use(`${API_BASE}/admin`, adminRoutes)
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });

@@ -15,7 +15,7 @@ interface IUserDoc extends Document<Types.ObjectId, any, IUser> {
   };
   isVerified: boolean;
   verificationToken?: string | null;  
-  role: 'USER' | 'ADMIN' | 'VENDOR';
+  role: 'USER' | 'ADMIN' | 'VENDOR' | 'SUPER_ADMIN';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -40,7 +40,7 @@ const UserSchema = new Schema<IUserModel>(
 
     role: {
       type: String,
-      enum: ['USER', 'ADMIN', 'VENDOR'],
+      enum: ['USER', 'ADMIN', 'VENDOR', 'SUPER_ADMIN'],
       default: 'USER',
     },
   },
