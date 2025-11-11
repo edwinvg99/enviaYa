@@ -1,0 +1,43 @@
+# Dependencias
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Reportes y caches
+coverage/
+.nyc_output/
+.eslintcache
+*.tsbuildinfo
+
+# Archivos de entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Archivos de build
+dist/
+build/
+
+# Archivos temporales
+.tmp/
+.cache/
+.parcel-cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
