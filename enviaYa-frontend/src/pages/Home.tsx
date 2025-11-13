@@ -1,9 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Home: React.FC = () => {
   const { isAuthenticated, user, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const [trackingNumber, setTrackingNumber] = useState('');
 
   if (isLoading) {
     return (
@@ -19,21 +21,45 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex flex-col ">
 
       {/* Hero Section */}
-      <section className="flex-1 flex items-center justify-center py-16 px-4">
+      <section className="flex-1 flex items-center justify-center py-16 px-4 bg-slate-900">
         <div className="max-w-3xl w-full mx-auto text-center animate-fade-in">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
-            Bienvenido a <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-700">EnvíaYa</span>
+          <h1 className="text-5xl md:text-6xl font-extrabold text-gray-100 mb-6 leading-tight">
+            Bienvenido a <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-100 to-primary-300">EnvíaYa</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-2xl mx-auto leading-relaxed">
             Tu plataforma de confianza para envíos rápidos y seguros.<br />
             <span className="text-primary-700 font-semibold">Conectamos negocios con clientes de manera eficiente.</span>
           </p>
 
+          {/* Seguimiento público de envíos */}
+          <div className="max-w-xl mx-auto bg-white backdrop-blur rounded-2xl shadow p-4 md:p-6 mb-8">
+            <div className="text-left mb-3">
+              <h2 className="text-lg font-semibold text-gray-900">¿Deseas seguir tu envío?</h2>
+              <p className="text-sm text-gray-600">Ingresa tu número de tracking para consultar el estado.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                placeholder="Ej: TRK-00000000-00000"
+                value={trackingNumber}
+                onChange={(e) => setTrackingNumber(e.target.value)}
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-600"
+              />
+              <button
+                onClick={() => trackingNumber.trim() && navigate(`/tracking/${trackingNumber.trim()}`)}
+                className="px-6 py-3 rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold hover:from-primary-700 hover:to-primary-800 disabled:opacity-50"
+                disabled={!trackingNumber.trim()}
+              >
+                Seguir envío
+              </button>
+            </div>
+          </div>
+
           {isAuthenticated ? (
-            <div className="space-y-6 animate-fade-in">
+            <div className="space-y-6 animate-fade-in gap-9">
               <div className="inline-block bg-white rounded-full shadow-lg p-6 mb-4">
                 <p className="text-lg text-gray-800">
                   ¡Hola de nuevo, <span className="font-bold text-primary-600">{user?.name}</span>! 
@@ -154,11 +180,11 @@ const Home: React.FC = () => {
       )} */}
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-8 px-4">
+      {/* <footer className="bg-gray-900 text-gray-300 py-8 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <p>&copy; 2024 EnvíaYa.</p>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 };

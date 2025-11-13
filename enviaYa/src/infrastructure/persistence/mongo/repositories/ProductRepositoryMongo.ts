@@ -5,12 +5,68 @@ export class ProductRepositoryMongo {
   async findAll(filters: any, page: number, limit: number): Promise<IProduct[]> {
     const query: any = { isActive: true, stock: { $gt: 0 }, isDiscontinued: { $ne: true } };
 
+    // Búsqueda por nombre
     if (filters.name) query.name = { $regex: filters.name, $options: "i" };
+    if (filters.search) query.name = { $regex: filters.search, $options: "i" };
+    
+    // Filtro por categoría
     if (filters.category) query.category = filters.category;
+    
+    // Filtro por rango de precios
     if (filters.minPrice || filters.maxPrice) {
       query.price = {};
-      if (filters.minPrice) query.price.$gte = filters.minPrice;
-      if (filters.maxPrice) query.price.$lte = filters.maxPrice;
+      if (filters.minPrice) query.price.$gte = parseFloat(filters.minPrice);
+      if (filters.maxPrice) query.price.$lte = parseFloat(filters.maxPrice);
+    }
+
+    const skip = (page - 1) * limit;
+    const products = await ProductModel.find(query).skip(skip).limit(limit);
+
+    return products.map((p: any) => ({
+      ...p.toObject(),
+      price: parseFloat(p.price.toFixed(2)),
+    }));
+  }
+
+  async findAllAdmin(filters: any, page: number, limit: number): Promise<IProduct[]> {
+    // Listado para ADMIN/VENDOR sin forzar isActive ni stock > 0
+    const query: any = {};
+
+    // Búsqueda por nombre
+    if (filters.name) query.name = { $regex: filters.name, $options: "i" };
+    if (filters.search) query.name = { $regex: filters.search, $options: "i" };
+
+    // Filtro por categoría
+    if (filters.category) query.category = filters.category;
+
+    // Filtro por proveedor
+    if (filters.supplier) query.supplier = filters.supplier;
+
+    // Filtro por activo/inactivo si viene especificado
+    if (typeof filters.isActive !== 'undefined') {
+      if (filters.isActive === 'true' || filters.isActive === true) query.isActive = true;
+      if (filters.isActive === 'false' || filters.isActive === false) query.isActive = false;
+    }
+
+    // Filtro por rango de precios
+    if (filters.minPrice || filters.maxPrice) {
+      query.price = {};
+      if (filters.minPrice) query.price.$gte = parseFloat(filters.minPrice);
+      if (filters.maxPrice) query.price.$lte = parseFloat(filters.maxPrice);
+    }
+
+    // Filtro por stock exacto o por comparadores simples
+    if (typeof filters.stock !== 'undefined') {
+      // stock puede ser número o comparador como ">=10", "<=0"
+      const s = String(filters.stock);
+      const match = s.match(/^(>=|<=|>|<)?\s*(\d+)$/);
+      if (match) {
+        const op = match[1];
+        const val = parseInt(match[2], 10);
+        if (!op) query.stock = val; else query.stock = { [op as any]: val } as any;
+      } else if (!Number.isNaN(Number(s))) {
+        query.stock = Number(s);
+      }
     }
 
     const skip = (page - 1) * limit;

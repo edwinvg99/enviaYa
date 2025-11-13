@@ -9,8 +9,8 @@ export class CreateSupplierUseCase {
   }
 
   async execute(supplierData: Supplier, userRole: string): Promise<Supplier> {
-    if (userRole?.trim() !== 'ADMIN') {
-      throw new Error('Solo los administradores pueden crear proveedores');
+    if (!['ADMIN', 'VENDOR'].includes(userRole?.trim())) {
+      throw new Error('Solo los administradores y vendedores pueden crear proveedores');
     }
 
     const existingSupplier = await this.supplierRepository.findByEmail(supplierData.email);
@@ -27,9 +27,10 @@ export class CreateSupplierUseCase {
       throw new Error('Email inválido');
     }
 
+    // Validación más flexible del teléfono colombiano
     const phoneRegex = /^\+57\d{10}$/;
     if (supplierData.phone && !phoneRegex.test(supplierData.phone)) {
-      throw new Error('Teléfono inválido. Formato esperado: +57XXXXXXXXXX');
+      throw new Error('Teléfono inválido. Formato esperado: +57 seguido de 10 dígitos (ej: +573001234567)');
     }
 
     return await this.supplierRepository.create(supplierData);

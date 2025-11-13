@@ -12,20 +12,18 @@ import Orders from './pages/Orders';
 import OrderSuccess from './pages/OrderSuccess';
 import Tracking from './pages/Tracking';
 import RoleRoute from './components/RoleRoute';
-import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/admin/Dashboard';
 import InventoryLayout from './pages/admin/Inventory';
 import ProductsAdmin from './pages/admin/inventory/ProductsAdmin';
 import CategoriesAdmin from './pages/admin/inventory/CategoriesAdmin';
 import SuppliersAdmin from './pages/admin/inventory/SuppliersAdmin';
 import OrdersAdmin from './pages/admin/OrdersAdmin';
-import ShipmentsAdmin from './pages/admin/ShipmentsAdmin';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen">
+        <div className="min-h-screen ">
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
@@ -38,8 +36,14 @@ function App() {
                 </RoleRoute>
               }
             />
-           <Route path="/admin/orders" element={<RoleRoute roles={['ADMIN', 'VENDOR']}><OrdersAdmin /></RoleRoute>} />
-             <Route path="/admin/shipments" element={<RoleRoute roles={['ADMIN', 'VENDOR']}><ShipmentsAdmin /></RoleRoute>} />
+            <Route
+              path="/admin/orders"
+              element={
+                <RoleRoute roles={["ADMIN", "VENDOR"]}>
+                  <OrdersAdmin />
+                </RoleRoute>
+              }
+            />
             <Route
               path="/admin/inventory/*"
               element={
@@ -56,10 +60,10 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/products" element={<Products />} />
             <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-            <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-            <Route path="/orders/success/:orderId" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/success/:orderId" element={<OrderSuccess />} />
           </Routes>
         </div>
       </AuthProvider>
@@ -68,4 +72,3 @@ function App() {
 }
 
 export default App;
-

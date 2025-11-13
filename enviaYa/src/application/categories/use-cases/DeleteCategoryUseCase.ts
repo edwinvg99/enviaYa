@@ -11,9 +11,9 @@ export class DeleteCategoryUseCase {
   }
 
   async execute(id: string, userRole: string): Promise<boolean> {
-    // Solo administradores pueden eliminar categorías
-    if (userRole !== 'ADMIN') {
-      throw new Error('Solo los administradores pueden eliminar categorías');
+    // Solo administradores y vendedores pueden eliminar categorías
+    if (!['ADMIN', 'VENDOR'].includes(userRole)) {
+      throw new Error('Solo los administradores y vendedores pueden eliminar categorías');
     }
 
     const existingCategory = await this.categoryRepository.findById(id);

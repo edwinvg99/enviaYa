@@ -13,8 +13,8 @@ const router = Router();
 router.get('/', getSuppliers);
 router.get('/:id', getSupplierById);
 
-router.post('/', authenticate, authorizeRoles('ADMIN'), createSupplier);
-router.put('/:id', authenticate, authorizeRoles('ADMIN'), updateSupplier);
-router.delete('/:id', authenticate, authorizeRoles('ADMIN'), deleteSupplier);
+router.post('/', authenticate, authorizeRoles('ADMIN', 'VENDOR'), createSupplier);
+router.put('/:id', authenticate, authorizeRoles('ADMIN', 'VENDOR'), updateSupplier);
+router.delete('/:id', authenticate, authorizeRoles('ADMIN', 'VENDOR'), deleteSupplier);
 
 export default router;

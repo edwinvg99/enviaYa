@@ -20,11 +20,11 @@ export class CheckoutService {
       throw new Error("El carrito ha expirado. Por favor, agrega los productos nuevamente.");
     }
 
-    // Verificar stock
+    // Validación mínima: existencia de productos; el stock ya fue reservado al agregar al carrito
     for (const item of cart.items) {
       const product = await ProductModel.findById(item.productId);
-      if (!product || product.stock < item.quantity) {
-        throw new Error(`No hay suficiente stock para el producto ${item.name}.`);
+      if (!product) {
+        throw new Error(`El producto ${item.name} ya no existe.`);
       }
     }
 
@@ -62,15 +62,9 @@ export class CheckoutService {
 
     const savedOrder = await this.orderRepo.create(newOrder);
 
-    // Descontar stock
-    for (const item of cart.items) {
-      await ProductModel.findByIdAndUpdate(item.productId, {
-        $inc: { stock: -item.quantity },
-      });
-    }
-
-    // Limpiar carrito
-    await this.cartRepo.clearCart(userId);
+    // No descontar stock aquí: ya se reservó al agregar al carrito
+    // Limpiar carrito sin reponer stock
+    await this.cartRepo.clearCart(userId, { restock: false });
 
     return savedOrder;
   }

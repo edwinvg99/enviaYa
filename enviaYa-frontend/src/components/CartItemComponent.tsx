@@ -38,9 +38,9 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
   const subtotal = item.price * item.quantity;
 
   return (
-    <div className="flex gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="flex gap-4 p-4 bg-slate-800 rounded-xl shadow-lg shadow-slate-900/50 border border-slate-700 hover:border-sky-500/50 transition-all">
       {/* Imagen del producto */}
-      <div className="w-24 h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
+      <div className="w-24 h-24 flex-shrink-0 bg-slate-900 rounded-lg overflow-hidden">
         {productImage ? (
           <img
             src={productImage}
@@ -48,7 +48,7 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
+          <div className="w-full h-full flex items-center justify-center text-slate-600">
             <svg
               className="w-8 h-8"
               fill="none"
@@ -69,8 +69,8 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
       {/* Información del producto */}
       <div className="flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="font-semibold text-gray-900">{productName}</h3>{" "}
-          <p className="text-sm text-gray-600">{formatPrice(item.price)} c/u</p>
+          <h3 className="font-semibold text-slate-100">{productName}</h3>{" "}
+          <p className="text-sm text-slate-400">{formatPrice(item.price)} c/u</p>
         </div>
 
         <div className="flex items-center justify-between">
@@ -79,18 +79,18 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
             <button
               onClick={() => onUpdateQuantity(productId, item.quantity - 1)}
               disabled={isUpdating || item.quantity <= 1}
-              className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center bg-slate-700 rounded hover:bg-sky-600 hover:shadow-lg hover:shadow-sky-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-slate-200"
               aria-label="Disminuir cantidad"
             >
               -
             </button>
-            <span className="w-12 text-center font-semibold">
+            <span className="w-12 text-center font-semibold text-slate-100">
               {item.quantity}
             </span>
             <button
               onClick={() => onUpdateQuantity(productId, item.quantity + 1)}
               disabled={isUpdating}
-              className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center bg-slate-700 rounded hover:bg-sky-600 hover:shadow-lg hover:shadow-sky-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-slate-200"
               aria-label="Aumentar cantidad"
             >
               +
@@ -99,7 +99,7 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
 
           {/* Subtotal */}
           <div className="text-right">
-            <p className="font-bold text-lg text-gray-900">
+            <p className="font-bold text-lg text-sky-400">
               {formatPrice(subtotal)}
             </p>
           </div>
@@ -110,7 +110,7 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
       <button
         onClick={() => onRemove(productId)}
         disabled={isUpdating}
-        className="text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
+        className="text-red-400 hover:text-red-300 hover:shadow-lg hover:shadow-red-500/30 transition-all disabled:opacity-50"
         aria-label="Eliminar producto"
       >
         <svg

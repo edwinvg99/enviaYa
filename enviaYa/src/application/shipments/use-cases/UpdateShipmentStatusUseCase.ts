@@ -17,7 +17,13 @@ export class UpdateShipmentStatusUseCase {
     location: string, 
     description: string,
     userRole: string,
-    carrierTrackingNumber?: string
+    carrierTrackingNumber?: string,
+    deliveryConfirmation?: {
+      confirmedBy: 'CUSTOMER' | 'ADMIN';
+      photoUrl?: string;
+      signature?: string;
+      notes?: string;
+    }
   ): Promise<any> {
     if (!['ADMIN', 'VENDOR'].includes(userRole)) {
       throw new Error('Solo administradores y vendedores pueden actualizar estados de envío');
@@ -39,6 +45,16 @@ export class UpdateShipmentStatusUseCase {
       }
     }
 
+    // Validar confirmación de entrega para estado ENTREGADO
+    if (newStatus === 'ENTREGADO') {
+      if (!deliveryConfirmation) {
+        throw new Error('Se requiere confirmación de entrega para marcar como ENTREGADO');
+      }
+      if (!deliveryConfirmation.photoUrl && !deliveryConfirmation.signature) {
+        throw new Error('Se requiere al menos una foto o firma de entrega');
+      }
+    }
+
     const updateData: any = {
       status: newStatus,
       currentLocation: location
@@ -50,6 +66,10 @@ export class UpdateShipmentStatusUseCase {
 
     if (newStatus === 'ENTREGADO') {
       updateData.actualDelivery = new Date();
+      updateData.deliveryConfirmation = {
+        ...deliveryConfirmation,
+        confirmedAt: new Date()
+      };
     }
 
     const updatedShipment = await this.shipmentRepository.update(shipmentId, updateData);

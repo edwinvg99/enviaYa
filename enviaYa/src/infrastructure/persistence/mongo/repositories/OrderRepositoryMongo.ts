@@ -50,6 +50,22 @@ export class OrderRepositoryMongo {
 
   async update(id: string, orderData: Partial<Order>): Promise<Order | null> {
     try {
+      // Proteger campos críticos de la orden
+      if (orderData.items !== undefined) {
+        const existingOrder = await OrderModel.findById(id);
+        if (existingOrder && existingOrder.status !== 'PENDIENTE') {
+          throw new Error('No se pueden modificar los items de una orden ya procesada');
+        }
+      }
+
+      // Prevenir modificación de precios calculados en órdenes procesadas
+      if (orderData.subtotal !== undefined || orderData.total !== undefined) {
+        const existingOrder = await OrderModel.findById(id);
+        if (existingOrder && existingOrder.status !== 'PENDIENTE') {
+          throw new Error('No se pueden modificar los totales de una orden ya procesada');
+        }
+      }
+
       const updatedOrder = await OrderModel.findByIdAndUpdate(
         id, 
         orderData, 
@@ -59,7 +75,7 @@ export class OrderRepositoryMongo {
       return updatedOrder ? updatedOrder.toObject() as Order : null;
     } catch (error) {
       console.error('Error al actualizar orden:', error);
-      throw new Error('No se pudo actualizar la orden');
+      throw error;
     }
   }
 

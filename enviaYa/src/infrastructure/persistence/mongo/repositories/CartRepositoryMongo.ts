@@ -92,12 +92,15 @@ export class CartRepositoryMongo {
     return cart.toObject() as Cart;
   }
 
-  async clearCart(userId: string): Promise<void> {
+  async clearCart(userId: string, options?: { restock?: boolean }): Promise<void> {
+    const restock = options?.restock ?? true;
     const cart = await CartModel.findOne({ userId });
     if (!cart) return;
 
-    for (const item of cart.items) {
-      await ProductModel.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
+    if (restock) {
+      for (const item of cart.items) {
+        await ProductModel.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
+      }
     }
 
     await CartModel.deleteOne({ userId });

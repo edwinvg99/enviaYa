@@ -36,11 +36,16 @@ export const createSupplier = async (req: Request, res: Response) => {
     const createSupplierUseCase = new CreateSupplierUseCase();
     const userRole = req.user!.role;
     
+    console.log('Datos recibidos en createSupplier:', JSON.stringify(req.body, null, 2));
+    console.log('User role:', userRole);
+    
     const supplier = await createSupplierUseCase.execute(req.body, userRole);
     
     res.status(201).json(successResponse(201, 'Proveedor creado exitosamente', supplier));
   } catch (error) {
-    res.status(400).json(errorResponse(400, 'Error al crear proveedor', error));
+    console.error('Error en createSupplier:', error);
+    const message = error instanceof Error ? error.message : 'Error al crear proveedor';
+    res.status(400).json(errorResponse(400, message, error));
   }
 };
 

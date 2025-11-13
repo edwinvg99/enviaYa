@@ -133,9 +133,16 @@ const Checkout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Finalizar Compra</h1>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-bold text-slate-100">Finalizar Compra</h1>
+        </div>
 
         {error && (
           <div className="mb-6">
@@ -148,10 +155,10 @@ const Checkout: React.FC = () => {
             {/* Formulario de envío y pago */}
             <div className="lg:col-span-2 space-y-6">
               {/* Dirección de envío */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Dirección de Envío</h2>
+              <div className="bg-slate-800 rounded-xl shadow-lg shadow-slate-900/50 border border-slate-700 p-6 text-amber-300">
+                <h2 className="text-2xl font-bold text-slate-100 mb-6">Dirección de Envío</h2>
                 
-                <div className="space-y-4">
+                <div className="space-y-4 text-white">
                   <Input
                     label="Dirección"
                     type="text"
@@ -162,7 +169,7 @@ const Checkout: React.FC = () => {
                     required
                   />
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 text-white">
                     <Input
                       label="Ciudad"
                       type="text"
@@ -183,7 +190,7 @@ const Checkout: React.FC = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 text-white">
                     <Input
                       label="Código Postal"
                       type="text"
@@ -207,56 +214,56 @@ const Checkout: React.FC = () => {
               </div>
 
               {/* Método de pago */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Método de Pago</h2>
+              <div className="bg-slate-800 rounded-xl shadow-lg shadow-slate-900/50 border border-slate-700 p-6">
+                <h2 className="text-2xl font-bold text-slate-100 mb-6">Método de Pago</h2>
                 
                 <div className="space-y-3">
-                  <label className="flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
+                  <label className="flex items-center p-4 border-2 border-slate-700 rounded-lg cursor-pointer hover:border-sky-500/50 hover:bg-slate-700/30 transition-all">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="CREDIT_CARD"
                       checked={paymentMethod === 'CREDIT_CARD'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
+                      className="mr-3 accent-sky-500"
                     />
-                    <span className="font-medium">Tarjeta de Crédito</span>
+                    <span className="font-medium text-slate-200">Tarjeta de Crédito</span>
                   </label>
 
-                  <label className="flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
+                  <label className="flex items-center p-4 border-2 border-slate-700 rounded-lg cursor-pointer hover:border-sky-500/50 hover:bg-slate-700/30 transition-all">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="DEBIT_CARD"
                       checked={paymentMethod === 'DEBIT_CARD'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
+                      className="mr-3 accent-sky-500"
                     />
-                    <span className="font-medium">Tarjeta Débito</span>
+                    <span className="font-medium text-slate-200">Tarjeta Débito</span>
                   </label>
 
-                  <label className="flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
+                  <label className="flex items-center p-4 border-2 border-slate-700 rounded-lg cursor-pointer hover:border-sky-500/50 hover:bg-slate-700/30 transition-all">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="CASH_ON_DELIVERY"
                       checked={paymentMethod === 'CASH_ON_DELIVERY'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
+                      className="mr-3 accent-sky-500"
                     />
-                    <span className="font-medium">Pago Contra Entrega</span>
+                    <span className="font-medium text-slate-200">Pago Contra Entrega</span>
                   </label>
                 </div>
 
                 <div className="mt-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
                     Notas del pedido (opcional)
                   </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:ring-2 focus:ring-sky-500 focus:border-transparent"
                     placeholder="Instrucciones especiales de entrega..."
                   />
                 </div>
@@ -265,36 +272,36 @@ const Checkout: React.FC = () => {
 
             {/* Resumen de la orden */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Resumen de la Orden</h2>
+              <div className="bg-slate-800 rounded-xl shadow-lg shadow-slate-900/50 border border-slate-700 p-6 sticky top-8">
+                <h2 className="text-2xl font-bold text-slate-100 mb-6">Resumen de la Orden</h2>
 
                 <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-slate-300">
                     <span>Subtotal ({cart.items.length} productos):</span>
-                    <span className="font-semibold">{formatPrice(cart.total)}</span>
+                    <span className="font-semibold text-slate-100">{formatPrice(cart.total)}</span>
                   </div>
                   
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-slate-300">
                     <span>Envío:</span>
                     <span className="font-semibold">
                       {calculateShippingCost() === 0 ? (
-                        <span className="text-green-600">¡GRATIS!</span>
+                        <span className="text-emerald-400">¡GRATIS!</span>
                       ) : (
-                        formatPrice(calculateShippingCost())
+                        <span className="text-slate-100">{formatPrice(calculateShippingCost())}</span>
                       )}
                     </span>
                   </div>
 
                   {cart.total < FREE_SHIPPING_THRESHOLD && (
-                    <p className="text-xs text-gray-500 bg-yellow-50 p-2 rounded">
+                    <p className="text-xs text-amber-300 bg-amber-950/30 border border-amber-500/30 p-2 rounded">
                       Agrega {formatPrice(FREE_SHIPPING_THRESHOLD - cart.total)} más para envío gratis
                     </p>
                   )}
 
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between text-xl font-bold text-gray-900">
-                      <span>Total:</span>
-                      <span className="text-primary-600">{formatPrice(calculateTotal())}</span>
+                  <div className="border-t border-slate-700 pt-3">
+                    <div className="flex justify-between text-xl font-bold">
+                      <span className="text-slate-100">Total:</span>
+                      <span className="text-sky-400">{formatPrice(calculateTotal())}</span>
                     </div>
                   </div>
                 </div>
@@ -312,7 +319,7 @@ const Checkout: React.FC = () => {
                   type="button"
                   onClick={() => navigate('/cart')}
                   disabled={processing}
-                  className="w-full px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  className="w-full px-6 py-3 border-2 border-slate-700 text-slate-300 rounded-lg font-semibold hover:bg-slate-700 transition-colors disabled:opacity-50"
                 >
                   Volver al Carrito
                 </button>

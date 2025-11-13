@@ -11,8 +11,8 @@ export class DeleteSupplierUseCase {
   }
 
   async execute(id: string, userRole: string): Promise<boolean> {
-    if (userRole?.trim() !== 'ADMIN') {
-      throw new Error('Solo los administradores pueden eliminar proveedores');
+    if (!['ADMIN', 'VENDOR'].includes(userRole?.trim())) {
+      throw new Error('Solo los administradores y vendedores pueden eliminar proveedores');
     }
 
     const existingSupplier = await this.supplierRepository.findById(id);

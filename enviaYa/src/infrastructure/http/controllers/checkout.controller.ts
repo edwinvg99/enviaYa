@@ -32,20 +32,13 @@ export const confirmCheckout = async (req: Request, res: Response) => {
       }
     }
 
+    // Validación mínima: existencia del producto; el stock ya está reservado al agregar al carrito
     let subtotal = 0;
     for (const item of cart.items) {
       const product = await ProductModel.findById(item.productId);
-
       if (!product) {
         return res.status(404).json({ message: `Producto no encontrado: ${item.productId}` });
       }
-
-      if (product.stock < item.quantity) {
-        return res.status(400).json({
-          message: `No hay suficiente stock para el producto ${product.name}`
-        });
-      }
-
       subtotal += item.price * item.quantity;
     }
 
@@ -83,13 +76,9 @@ export const confirmCheckout = async (req: Request, res: Response) => {
 
     const savedOrder = await orderRepo.create(newOrder as any);
 
-    for (const item of cart.items) {
-      await ProductModel.findByIdAndUpdate(item.productId, {
-        $inc: { stock: -item.quantity }
-      });
-    }
-
-    await cartRepo.clearCart(userId);
+    // No descontar stock aquí: el stock fue reservado al agregar al carrito
+    // Limpiar carrito sin reponer stock (orden confirmada)
+    await cartRepo.clearCart(userId, { restock: false });
 
     
     try {

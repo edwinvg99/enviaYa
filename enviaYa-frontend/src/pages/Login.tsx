@@ -67,7 +67,11 @@ const Login: React.FC = () => {
     try {
       const response = await authService.login(formData);
       login(response.user);
-      navigate("/");
+      if (response.user.role === 'ADMIN' || response.user.role === 'VENDOR') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setErrors({ general: getErrorMessage(err) });
     } finally {

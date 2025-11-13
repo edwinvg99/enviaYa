@@ -10,8 +10,8 @@ export class CreateCategoryUseCase {
   }
 
   async execute(categoryData: Category, userRole: string): Promise<Category> {
-    if (userRole !== 'ADMIN') {
-      throw new Error('Solo los administradores pueden crear categorías');
+    if (!['ADMIN', 'VENDOR'].includes(userRole)) {
+      throw new Error('Solo los administradores y vendedores pueden crear categorías');
     }
 
     const existingCategory = await this.categoryRepository.findByName(categoryData.name);

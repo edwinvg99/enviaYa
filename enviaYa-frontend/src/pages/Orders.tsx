@@ -108,9 +108,20 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Mis Órdenes</h1>
+        {/* Header mejorado */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+            <h1 className="text-4xl font-bold text-slate-100">Mis Órdenes</h1>
+          </div>
+          <p className="text-slate-400 ml-15">Revisa el estado y detalles de tus pedidos</p>
+        </div>
 
         {error && (
           <div className="mb-6">
@@ -133,37 +144,80 @@ const Orders: React.FC = () => {
             }}
           />
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {orders.map((order) => (
               <div
                 key={order._id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                className="group bg-slate-800 rounded-xl shadow-lg shadow-slate-900/50 border border-slate-700 overflow-hidden hover:shadow-2xl hover:shadow-sky-500/20 hover:border-sky-500/50 transition-all duration-300 cursor-pointer"
                 onClick={() => setSelectedOrder(order)}
               >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">{order.orderNumber}</h3>
-                    <p className="text-sm text-gray-600">{formatDate(order.createdAt)}</p>
+                <div className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                    <div className="mb-3 md:mb-0">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h3 className="text-xl font-bold text-slate-100 group-hover:text-sky-400 transition-colors">
+                          {order.orderNumber}
+                        </h3>
+                        <Badge variant={getStatusBadgeVariant(order.status)} size="lg">
+                          {order.status.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center text-sm text-slate-400">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {formatDate(order.createdAt)}
+                      </div>
+                    </div>
                   </div>
-                  <div className="mt-2 md:mt-0">
-                    <Badge variant={getStatusBadgeVariant(order.status)} size="lg">
-                      {order.status.replace('_', ' ')}
-                    </Badge>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <p className="text-gray-600">Productos:</p>
-                    <p className="font-semibold">{order.items.length} artículo(s)</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Productos */}
+                    <div className="flex items-center space-x-3 p-3 bg-sky-500/20 rounded-xl border border-sky-500/30">
+                      <div className="w-10 h-10 rounded-lg bg-sky-500/30 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium">Productos</p>
+                        <p className="text-lg font-bold text-slate-100">{order.items.length}</p>
+                      </div>
+                    </div>
+
+                    {/* Total */}
+                    <div className="flex items-center space-x-3 p-3 bg-emerald-500/20 rounded-xl border border-emerald-500/30">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-500/30 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium">Total</p>
+                        <p className="text-lg font-bold text-emerald-400">{formatPrice(order.total)}</p>
+                      </div>
+                    </div>
+
+                    {/* Pago */}
+                    <div className="flex items-center space-x-3 p-3 bg-purple-500/20 rounded-xl border border-purple-500/30">
+                      <div className="w-10 h-10 rounded-lg bg-purple-500/30 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium">Pago</p>
+                        <p className="text-sm font-bold text-slate-100">{order.paymentStatus}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600">Total:</p>
-                    <p className="font-semibold text-primary-600">{formatPrice(order.total)}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Estado de pago:</p>
-                    <p className="font-semibold">{order.paymentStatus}</p>
+
+                  {/* Indicador de clic */}
+                  <div className="mt-4 flex items-center justify-center text-sm text-sky-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity text-white">
+                    <span className='text-white'>Click para ver detalles</span>
+                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
                 </div>
               </div>

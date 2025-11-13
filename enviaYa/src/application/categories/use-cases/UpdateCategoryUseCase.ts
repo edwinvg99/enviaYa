@@ -9,8 +9,8 @@ export class UpdateCategoryUseCase {
   }
 
   async execute(id: string, categoryData: Partial<Category>, userRole: string): Promise<Category | null> {
-    if (userRole !== 'ADMIN') {
-      throw new Error('Solo los administradores pueden actualizar categorías');
+    if (!['ADMIN', 'VENDOR'].includes(userRole)) {
+      throw new Error('Solo los administradores y vendedores pueden actualizar categorías');
     }
 
     const existingCategory = await this.categoryRepository.findById(id);

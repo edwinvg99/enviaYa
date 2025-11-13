@@ -12,8 +12,8 @@ export class UpdateProductUseCase {
   }
 
   async execute(id: string, productData: Partial<IProduct>, userRole: string): Promise<IProduct | null> {
-    if (userRole !== 'ADMIN') {
-      throw new Error('Solo los administradores pueden actualizar productos');
+    if (!['ADMIN', 'VENDOR'].includes(userRole)) {
+      throw new Error('Solo los administradores y vendedores pueden actualizar productos');
     }
 
     const existingProduct = await this.productRepository.findById(id);

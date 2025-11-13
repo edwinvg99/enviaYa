@@ -7,7 +7,8 @@ import {
   updateShipmentStatus,
   getShipmentsByStatus,
   getUserShipments,
-  markOverdueAsLost
+  markOverdueAsLost,
+  confirmDelivery
 } from '../controllers/shipments.controller';
 import { authenticate, authorizeRoles } from '../middlewares/auth';
 
@@ -23,6 +24,7 @@ router.get('/:id', authenticate, getShipmentById);
 router.post('/', authenticate, authorizeRoles('ADMIN', 'VENDOR'), createShipment);
 
 router.patch('/:id/status', authenticate, authorizeRoles('ADMIN', 'VENDOR'), updateShipmentStatus);
+router.post('/:id/confirm-delivery', authenticate, confirmDelivery);
 
 router.post('/mark-overdue-lost', authenticate, authorizeRoles('ADMIN'), markOverdueAsLost);
 

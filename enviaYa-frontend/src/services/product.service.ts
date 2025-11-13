@@ -36,8 +36,45 @@ export const productService = {
     return normalizeProductsResponse(response.data);
   },
 
+  // Solo para ADMIN/VENDOR: lista completa sin filtrar por stock > 0 o isActive
+  getProductsAdmin: async (filters?: ProductFilters): Promise<ProductsData> => {
+    const params = new URLSearchParams();
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.category) params.append('category', filters.category);
+    if (filters?.supplier) params.append('supplier', filters.supplier);
+    if (filters?.minPrice) params.append('minPrice', filters.minPrice.toString());
+    if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString());
+
+    const queryString = params.toString();
+    const url = queryString ? `/products/admin/all?${queryString}` : '/products/admin/all';
+    const response = await api.get<ProductsResponse>(url);
+    return normalizeProductsResponse(response.data);
+  },
+
   getProductById: async (id: string): Promise<Product> => {
     const response = await api.get<ProductResponse>(`/products/${id}`);
+    return response.data.data;
+  },
+
+  createProduct: async (payload: Partial<Product>): Promise<Product> => {
+    const response = await api.post<ProductResponse>('/products', payload);
+    return response.data.data;
+  },
+
+  updateProduct: async (id: string, payload: Partial<Product>): Promise<Product> => {
+    const response = await api.put<ProductResponse>(`/products/${id}`, payload);
+    return response.data.data;
+  },
+
+  deleteProduct: async (id: string): Promise<void> => {
+    await api.delete(`/products/${id}`);
+  },
+
+  updateStock: async (id: string, quantityDelta: number): Promise<Product> => {
+    const response = await api.patch<ProductResponse>(`/products/${id}/stock`, { quantity: quantityDelta });
     return response.data.data;
   },
 

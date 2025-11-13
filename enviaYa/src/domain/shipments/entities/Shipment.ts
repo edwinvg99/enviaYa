@@ -14,9 +14,18 @@ export interface Shipment {
   carrier: string;
   carrierTrackingNumber?: string;
   shippingAddress: Address;
+  deliveryConfirmation?: DeliveryConfirmation;
   notes?: string;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface DeliveryConfirmation {
+  confirmedBy: 'CUSTOMER' | 'ADMIN';
+  photoUrl?: string;
+  signature?: string;
+  confirmedAt: Date;
+  notes?: string;
 }
 
 export interface ShipmentHistory {

@@ -65,7 +65,7 @@ export const updateShipmentStatus = async (req: Request, res: Response) => {
   try {
     const updateShipmentStatusUseCase = new UpdateShipmentStatusUseCase();
     const userRole = req.user?.role || 'USER';
-    const { status, location, description, carrierTrackingNumber } = req.body;
+    const { status, location, description, carrierTrackingNumber, deliveryConfirmation } = req.body;
     
     const shipment = await updateShipmentStatusUseCase.execute(
       req.params.id, 
@@ -73,7 +73,8 @@ export const updateShipmentStatus = async (req: Request, res: Response) => {
       location, 
       description, 
       userRole,
-      carrierTrackingNumber
+      carrierTrackingNumber,
+      deliveryConfirmation
     );
     
     res.json(successResponse(200, 'Estado de envío actualizado exitosamente', shipment));
@@ -114,5 +115,45 @@ export const markOverdueAsLost = async (req: Request, res: Response) => {
     res.json(successResponse(200, `Se marcaron ${processedCount} envíos como perdidos`));
   } catch (error) {
     res.status(500).json(errorResponse(500, 'Error al procesar envíos vencidos', error));
+  }
+};
+
+export const confirmDelivery = async (req: Request, res: Response) => {
+  try {
+    const updateShipmentStatusUseCase = new UpdateShipmentStatusUseCase();
+    const userRole = req.user?.role || 'USER';
+    const { photoUrl, signature, notes } = req.body;
+    
+    const shipmentRepository = new ShipmentRepositoryMongo();
+    const shipment = await shipmentRepository.findById(req.params.id);
+    
+    if (!shipment) {
+      return res.status(404).json(errorResponse(404, 'Envío no encontrado'));
+    }
+    
+    if (shipment.status !== 'EN_ENTREGA') {
+      return res.status(400).json(errorResponse(400, 'Solo se pueden confirmar envíos en estado EN_ENTREGA'));
+    }
+    
+    const deliveryConfirmation = {
+      confirmedBy: userRole === 'USER' ? 'CUSTOMER' as const : 'ADMIN' as const,
+      photoUrl,
+      signature,
+      notes
+    };
+    
+    const updatedShipment = await updateShipmentStatusUseCase.execute(
+      req.params.id,
+      'ENTREGADO',
+      shipment.currentLocation,
+      'Entrega confirmada exitosamente',
+      userRole,
+      undefined,
+      deliveryConfirmation
+    );
+    
+    res.json(successResponse(200, 'Entrega confirmada exitosamente', updatedShipment));
+  } catch (error: any) {
+    res.status(400).json(errorResponse(400, 'Error al confirmar entrega', error.message || error));
   }
 };

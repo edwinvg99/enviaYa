@@ -3,17 +3,24 @@ import React from 'react';
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger';
   isLoading?: boolean;
+  size?: 'xs' | 'sm' | 'md';
 }
 
 const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
   isLoading = false,
+  size = 'md',
   className = '',
   disabled,
   ...props
 }) => {
-  const baseStyles = 'px-6 py-3 rounded-lg font-medium transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+  const sizeStyles = {
+    xs: 'px-2 py-1 text-xs rounded',
+    sm: 'px-3 py-2 text-sm rounded-md',
+    md: 'px-6 py-3 text-sm rounded-lg'
+  };
+  const baseStyles = 'font-medium transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
     primary: 'bg-primary-600 hover:bg-primary-700 text-white',
@@ -23,7 +30,7 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${className}`}
+      className={`${baseStyles} ${sizeStyles[size]} ${variants[variant]} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >

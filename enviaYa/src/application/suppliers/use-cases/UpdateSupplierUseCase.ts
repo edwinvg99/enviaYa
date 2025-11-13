@@ -9,8 +9,8 @@ export class UpdateSupplierUseCase {
   }
 
   async execute(id: string, supplierData: Partial<Supplier>, userRole: string): Promise<Supplier | null> {
-    if (userRole?.trim() !== 'ADMIN') {
-      throw new Error('Solo los administradores pueden actualizar proveedores');
+    if (!['ADMIN', 'VENDOR'].includes(userRole?.trim())) {
+      throw new Error('Solo los administradores y vendedores pueden actualizar proveedores');
     }
 
     const existingSupplier = await this.supplierRepository.findById(id);
@@ -33,7 +33,7 @@ export class UpdateSupplierUseCase {
     if (supplierData.phone) {
       const phoneRegex = /^\+57\d{10}$/;
       if (!phoneRegex.test(supplierData.phone)) {
-        throw new Error('Teléfono inválido. Formato esperado: +57XXXXXXXXXX');
+        throw new Error('Teléfono inválido. Formato esperado: +57 seguido de 10 dígitos (ej: +573001234567)');
       }
     }
 

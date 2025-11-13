@@ -100,3 +100,18 @@ export const updateStock = async (req: Request, res: Response) => {
     res.status(400).json(errorResponse(400, 'Error al actualizar stock', error));
   }
 };
+
+export const getProductsAdmin = async (req: Request, res: Response) => {
+  try {
+    // Solo ADMIN/VENDOR deberían llegar aquí por middleware en rutas
+    const productRepository = new ProductRepositoryMongo();
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const filters = req.query;
+
+    const products = await productRepository.findAllAdmin(filters, page, limit);
+    res.json(successResponse(200, 'Productos (admin) obtenidos exitosamente', products));
+  } catch (error) {
+    res.status(500).json(errorResponse(500, 'Error al obtener productos (admin)', error));
+  }
+};

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productService } from '../services/product.service';
+import { categoryService, type Category } from '../services/category.service';
 import { cartService } from '../services/cart.service';
 import { useAuth } from '../context/AuthContext';
 import ProductCard from '../components/ProductCard';
@@ -11,10 +12,14 @@ import type { Product } from '../types/product.types';
 
 const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { user } = useAuth();
@@ -25,11 +30,15 @@ const Products: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = searchTerm
-        ? await productService.searchProducts(searchTerm, currentPage, 12)
-        : await productService.getActiveProducts(currentPage, 12);
+      const filters: Record<string, string | number> = { page: currentPage, limit: 12 };
+      
+      if (searchTerm) filters.search = searchTerm;
+      if (selectedCategory) filters.category = selectedCategory;
+      if (minPrice) filters.minPrice = parseFloat(minPrice);
+      if (maxPrice) filters.maxPrice = parseFloat(maxPrice);
+      
+      const response = await productService.getProducts(filters);
 
-      // La respuesta ya viene normalizada del servicio
       setProducts(response.products || []);
       setTotalPages(response.pagination?.totalPages || 1);
     } catch (err: unknown) {
@@ -41,10 +50,34 @@ const Products: React.FC = () => {
     }
   };
 
+  const loadCategories = async () => {
+    try {
+      const cats = await categoryService.getCategories();
+      setCategories(cats);
+    } catch (err) {
+      console.error('Error al cargar categorías:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  // Debounce para búsqueda y filtros de precio
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadProducts();
+    }, 500); // 500ms de delay
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, minPrice, maxPrice]);
+
+  // Sin debounce para categoría y paginación (cambio inmediato)
   useEffect(() => {
     loadProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchTerm]);
+  }, [currentPage, selectedCategory]);
 
   const handleAddToCart = async (product: Product) => {
     if (!user) {
@@ -70,7 +103,14 @@ const Products: React.FC = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
-    loadProducts();
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('');
+    setMinPrice('');
+    setMaxPrice('');
+    setCurrentPage(1);
   };
 
   if (loading && products.length === 0) {
@@ -82,27 +122,100 @@ const Products: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Catálogo de Productos</h1>
+          <h1 className="text-4xl font-bold text-slate-100 mb-6">Catálogo de Productos</h1>
           
-          {/* Barra de búsqueda */}
-          <form onSubmit={handleSearch} className="flex gap-4">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar productos..."
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
-            >
-              Buscar
-            </button>
+          {/* Barra de búsqueda y filtros */}
+          <form onSubmit={handleSearch} className="space-y-4">
+            {/* Fila 1: Búsqueda */}
+            <div className="flex gap-4">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Buscar productos por nombre..."
+                className="flex-1 px-4 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-slate-800 text-slate-100 placeholder-slate-400"
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 bg-sky-600 text-white rounded-lg font-semibold hover:bg-sky-700 transition-colors shadow-lg shadow-sky-600/30"
+              >
+                Buscar
+              </button>
+            </div>
+
+            {/* Fila 2: Filtros */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Filtro de categoría */}
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-slate-300 mb-1">
+                  Categoría
+                </label>
+                <select
+                  id="category"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-slate-800 text-slate-100"
+                >
+                  <option value="">Todas las categorías</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Filtro de precio mínimo */}
+              <div>
+                <label htmlFor="minPrice" className="block text-sm font-medium text-slate-300 mb-1">
+                  Precio mínimo
+                </label>
+                <input
+                  id="minPrice"
+                  type="number"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                  placeholder="$0"
+                  min="0"
+                  step="1000"
+                  className="w-full px-4 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-slate-800 text-slate-100 placeholder-slate-400"
+                />
+              </div>
+
+              {/* Filtro de precio máximo */}
+              <div>
+                <label htmlFor="maxPrice" className="block text-sm font-medium text-slate-300 mb-1">
+                  Precio máximo
+                </label>
+                <input
+                  id="maxPrice"
+                  type="number"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  placeholder="Sin límite"
+                  min="0"
+                  step="1000"
+                  className="w-full px-4 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-slate-800 text-slate-100 placeholder-slate-400"
+                />
+              </div>
+            </div>
+
+            {/* Botón para limpiar filtros */}
+            {(searchTerm || selectedCategory || minPrice || maxPrice) && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleClearFilters}
+                  className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors"
+                >
+                  Limpiar filtros
+                </button>
+              </div>
+            )}
           </form>
         </div>
 
@@ -125,11 +238,8 @@ const Products: React.FC = () => {
             title="No hay productos disponibles"
             message="No se encontraron productos que coincidan con tu búsqueda."
             action={{
-              label: 'Ver todos los productos',
-              onClick: () => {
-                setSearchTerm('');
-                setCurrentPage(1);
-              }
+              label: 'Limpiar filtros',
+              onClick: handleClearFilters
             }}
           />
         ) : (
@@ -150,19 +260,19 @@ const Products: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg font-semibold text-slate-300 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Anterior
                 </button>
                 
-                <span className="text-gray-700 font-medium">
+                <span className="text-slate-300 font-medium">
                   Página {currentPage} de {totalPages}
                 </span>
                 
                 <button
                   onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg font-semibold text-slate-300 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Siguiente
                 </button>
