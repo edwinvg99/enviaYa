@@ -1,6 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import type { CartItem as CartItemType } from "../types/cart.types";
-import type { Product } from "../types/product.types";
 
 interface CartItemComponentProps {
   item: CartItemType;
@@ -15,17 +15,14 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
   onRemove,
   isUpdating,
 }) => {
+  const navigate = useNavigate();
+  
   const productId =
     typeof item.productId === "string" ? item.productId : item.productId._id;
 
-  // Usar los datos que vienen directamente del item
-  const productName = (item as any).name || "Producto";
-  const productImage = (item as any).image;
-  
-  // DEBUG: Ver qué datos llegan
-  console.log('Item completo:', item);
-  console.log('Nombre del producto:', productName);
-  console.log('Imagen del producto:', productImage);
+  // Usar datos del item directamente (vienen del backend)
+  const productName = item.name || "Producto";
+  const productImage = item.image;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("es-CO", {
@@ -37,10 +34,17 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
 
   const subtotal = item.price * item.quantity;
 
+  const handleItemClick = () => {
+    navigate(`/products/${productId}`);
+  };
+
   return (
     <div className="flex gap-4 p-4 bg-slate-800 rounded-xl shadow-lg shadow-slate-900/50 border border-slate-700 hover:border-sky-500/50 transition-all">
-      {/* Imagen del producto */}
-      <div className="w-24 h-24 flex-shrink-0 bg-slate-900 rounded-lg overflow-hidden">
+      {/* Imagen del producto - Clickeable */}
+      <div 
+        onClick={handleItemClick}
+        className="w-24 h-24 shrink-0 bg-slate-900 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-sky-500/50 transition-all"
+      >
         {productImage ? (
           <img
             src={productImage}
@@ -66,10 +70,10 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
         )}
       </div>
 
-      {/* Información del producto */}
+      {/* Información del producto - Clickeable */}
       <div className="flex-1 flex flex-col justify-between">
-        <div>
-          <h3 className="font-semibold text-slate-100">{productName}</h3>{" "}
+        <div onClick={handleItemClick} className="cursor-pointer">
+          <h3 className="font-semibold text-slate-100 hover:text-sky-400 transition-colors">{productName}</h3>{" "}
           <p className="text-sm text-slate-400">{formatPrice(item.price)} c/u</p>
         </div>
 

@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { orderAdminService } from '../../services/orderAdmin.service';
+import { shipmentAdminService } from '../../services/shipmentAdmin.service';
 import type { Order, OrderStatus } from '../../types/order.types';
 import Toast from '../../components/Toast';
 
-type FilterTab = 'all' | 'PENDIENTE' | 'PREPARANDO' | 'EN_TRANSITO';
+type FilterTab = 'all' | 'PENDIENTE' | 'PREPARANDO' | 'EN_TRANSITO' | 'EN_ENTREGA' | 'ENTREGADO' | 'CANCELADO';
 
 const OrdersAdmin: React.FC = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
@@ -72,8 +75,22 @@ const OrdersAdmin: React.FC = () => {
 
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
     try {
-      await orderAdminService.updateOrderStatus(orderId, newStatus);
-      setToast({ type: 'success', message: 'Estado actualizado' });
+      // Si cambiamos a PREPARANDO, crear automáticamente el envío
+      if (newStatus === 'PREPARANDO') {
+        await orderAdminService.updateOrderStatus(orderId, newStatus);
+        // Crear envío automáticamente (backend lo pone en PENDIENTE y orden sigue en PREPARANDO)
+        try {
+          const shipment = await shipmentAdminService.createShipment(orderId);
+          setToast({ type: 'success', message: `Orden preparándose. Envío creado: ${shipment.trackingNumber}` });
+        } catch (shipErr: unknown) {
+          const error = shipErr as { response?: { data?: { message?: string } } };
+          const shipMsg = error.response?.data?.message || 'Envío no pudo crearse';
+          setToast({ type: 'error', message: `Orden en PREPARANDO, pero ${shipMsg}` });
+        }
+      } else {
+        await orderAdminService.updateOrderStatus(orderId, newStatus);
+        setToast({ type: 'success', message: 'Estado actualizado' });
+      }
       await fetchOrders();
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Error actualizando estado';
@@ -90,7 +107,7 @@ const OrdersAdmin: React.FC = () => {
       ENTREGADO: 'bg-green-600',
       CANCELADO: 'bg-red-600'
     };
-    return <span className={`px-2 py-1 rounded text-xs font-semibold text-white ${colors[status]}`}>{status}</span>;
+    return <span className={`inline-block w-28 text-center px-2 py-1 rounded text-xs font-semibold text-white ${colors[status]}`}>{status}</span>;
   };
 
   const formatDate = (date?: string | Date) => {
@@ -112,11 +129,15 @@ const OrdersAdmin: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-8 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          <button
+            onClick={() => navigate('/admin')}
+            className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-sky-400 transition border border-slate-700"
+            title="Volver al panel de control"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-          </div>
+          </button>
           <h1 className="text-3xl font-bold text-slate-100">Gestión de Órdenes</h1>
         </div>
         <button 
@@ -142,6 +163,15 @@ const OrdersAdmin: React.FC = () => {
         </button>
         <button onClick={() => handleTabChange('EN_TRANSITO')} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab === 'EN_TRANSITO' ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'}`}>
           En Tránsito
+        </button>
+        <button onClick={() => handleTabChange('EN_ENTREGA')} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab === 'EN_ENTREGA' ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'}`}>
+          En Entrega
+        </button>
+        <button onClick={() => handleTabChange('ENTREGADO')} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab === 'ENTREGADO' ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'}`}>
+          Entregadas
+        </button>
+        <button onClick={() => handleTabChange('CANCELADO')} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab === 'CANCELADO' ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'}`}>
+          Canceladas
         </button>
       </div>
 
@@ -182,7 +212,7 @@ const OrdersAdmin: React.FC = () => {
                     <td className="py-3 px-4 text-slate-300">{order.items.length}</td>
                     <td className="py-3 px-4 text-sky-400 font-semibold">{formatCurrency(order.total)}</td>
                     <td className="py-3 px-4">{getStatusBadge(order.status)}</td>
-                    <td className="py-3 px-4 text-right space-x-2">
+                    <td className="py-3 px-4 text-right space-x-2 ">
                       <button onClick={() => openDetail(order)} className="px-3 py-1 rounded bg-sky-600 text-white text-xs hover:bg-sky-700 shadow-lg shadow-sky-600/30 transition">Ver</button>
                       {order.status === 'PENDIENTE' && (
                         <button onClick={() => openCancelModal(order)} className="px-3 py-1 rounded bg-red-600 text-white text-xs hover:bg-red-700 shadow-lg shadow-red-600/30 transition">Cancelar</button>
@@ -285,7 +315,7 @@ const OrdersAdmin: React.FC = () => {
       {showCancelModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-gray-900 w-full max-w-md rounded-lg p-6 shadow-lg">
-            <h4 className="text-lg font-semibold mb-3">Cancelar Orden {selectedOrder.orderNumber}</h4>
+            <h4 className="text-lg font-semibold mb-3 text-sky-500">Cancelar Orden {selectedOrder.orderNumber}</h4>
             <p className="text-sm text-gray-300 mb-4">Esta acción cancelará la orden, devolverá el stock automáticamente y notificará al cliente.</p>
             
             <div className="mb-4">

@@ -16,8 +16,9 @@ export const shipmentAdminService = {
   async getShipmentByTracking(trackingNumber: string): Promise<Shipment> {
     return unwrap(await api.get<ApiResponse<Shipment>>(`/shipments/tracking/${trackingNumber}`));
   },
-  async createShipment(payload: CreateShipmentPayload): Promise<Shipment> {
-    return unwrap(await api.post<ApiResponse<Shipment>>('/shipments', payload));
+  async createShipment(orderId: string): Promise<Shipment> {
+    // Backend espera { orderId } en el body
+    return unwrap(await api.post<ApiResponse<Shipment>>('/shipments', { orderId }));
   },
   async updateShipmentStatus(id: string, payload: UpdateShipmentStatusPayload): Promise<Shipment> {
     return unwrap(await api.patch<ApiResponse<Shipment>>(`/shipments/${id}/status`, payload));

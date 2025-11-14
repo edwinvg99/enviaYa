@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { shipmentAdminService } from '../../services/shipmentAdmin.service';
 import type { Shipment, ShipmentStatus, UpdateShipmentStatusPayload } from '../../types/shipment.types';
 import Toast from '../../components/Toast';
@@ -34,6 +35,7 @@ const tabs: (ShipmentStatus | 'ALL')[] = ['ALL','PENDIENTE','PREPARANDO','EN_TRA
 interface ToastState { type: 'success' | 'error'; message: string; }
 
 const ShipmentsAdmin: React.FC = () => {
+  const navigate = useNavigate();
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [filtered, setFiltered] = useState<Shipment[]>([]);
   const [activeTab, setActiveTab] = useState<'ALL' | ShipmentStatus>('ALL');
@@ -101,18 +103,28 @@ const ShipmentsAdmin: React.FC = () => {
       if (!validTransitions[selected.status].includes(advanceStatus)) {
         setToast({ type:'error', message:'Transición inválida'}); return;
       }
+
+      // Reglas de validación adicionales
+      if (selected.status === 'PREPARANDO' && advanceStatus === 'EN_TRANSITO' && !carrierTrackingNumber.trim()) {
+        setToast({ type:'error', message:'Debes ingresar el número de guía de la transportadora'});
+        return;
+      }
+
+      const loc = (location || '').trim() || (advanceStatus === 'EN_ENTREGA' ? 'Centro de distribución Medellín' : 'Ubicación no especificada');
+      const desc = (description || '').trim() || (advanceStatus === 'EN_ENTREGA' ? 'En vehículo de reparto' : 'Actualización de estado');
+
       const payload: UpdateShipmentStatusPayload = {
         status: advanceStatus,
-        location: location || 'Ubicación no especificada',
-        description: description || 'Actualización de estado',
-        carrierTrackingNumber: carrierTrackingNumber || undefined
+        location: loc,
+        description: desc,
+        carrierTrackingNumber: carrierTrackingNumber?.trim() || undefined
       };
       const updated = await shipmentAdminService.updateShipmentStatus(selected._id!, payload);
       setToast({ type:'success', message:`Envío ${updated.trackingNumber} -> ${advanceStatus}` });
       closeAdvance();
       loadShipments();
-    } catch(e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Error actualizando estado';
+    } catch(e: any) {
+      const msg = e?.response?.data?.message || (e instanceof Error ? e.message : 'Error actualizando estado');
       setToast({ type:'error', message: msg });
     }
   };
@@ -123,10 +135,12 @@ const ShipmentsAdmin: React.FC = () => {
       if (!photoUrl && !signature) {
         setToast({ type:'error', message:'Se requiere foto o firma'}); return;
       }
+      const loc = (location || '').trim() || 'Dirección de entrega';
+      const desc = (description || '').trim() || 'Entrega confirmada';
       const payload: UpdateShipmentStatusPayload = {
         status: 'ENTREGADO',
-        location: location || 'Dirección de entrega',
-        description: description || 'Entrega confirmada',
+        location: loc,
+        description: desc,
         deliveryConfirmation: {
           confirmedBy: user?.role === 'ADMIN' ? 'ADMIN' : 'CUSTOMER',
           photoUrl: photoUrl || undefined,
@@ -138,8 +152,8 @@ const ShipmentsAdmin: React.FC = () => {
       setToast({ type:'success', message:`Entrega confirmada: ${updated.trackingNumber}` });
       closeConfirmDelivery();
       loadShipments();
-    } catch(e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Error confirmando entrega';
+    } catch(e: any) {
+      const msg = e?.response?.data?.message || (e instanceof Error ? e.message : 'Error confirmando entrega');
       setToast({ type:'error', message: msg });
     }
   };
@@ -161,11 +175,15 @@ const ShipmentsAdmin: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+          <button
+            onClick={() => navigate('/admin')}
+            className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-sky-400 transition border border-slate-700"
+            title="Volver al panel de control"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-          </div>
+          </button>
           <h1 className="text-3xl font-bold text-slate-100">Gestión de Envíos</h1>
         </div>
       </div>
@@ -253,7 +271,7 @@ const ShipmentsAdmin: React.FC = () => {
               <p className="font-semibold mb-1">Historial:</p>
               <ul className="max-h-40 overflow-y-auto space-y-1">
                 {selected.history.slice().reverse().map((h,i) => (
-                  <li key={i} className="text-gray-300">[{new Date(h.timestamp).toLocaleDateString('es-ES')}] {statusLabels[h.status]} - {h.location}: {h.description}</li>
+                  <li key={i} className="text-gray-800">[{new Date(h.timestamp).toLocaleDateString('es-ES')}] {statusLabels[h.status]} - {h.location}: {h.description}</li>
                 ))}
               </ul>
             </div>
@@ -272,10 +290,10 @@ const ShipmentsAdmin: React.FC = () => {
       {/* Modal avanzar */}
       {showAdvance && selected && (
   <Modal isOpen={true} title={`Avanzar envío ${selected.trackingNumber}`} onClose={closeAdvance}>
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-sm ">
             <div>
-              <label htmlFor="advanceStatus" className="block text-xs mb-1">Nuevo estado</label>
-              <select id="advanceStatus" aria-label="Nuevo estado" value={advanceStatus} onChange={e=>setAdvanceStatus(e.target.value as ShipmentStatus)} className="w-full bg-gray-800 rounded p-2 text-sm">
+              <label htmlFor="advanceStatus" className="block text-xs mb-1 text-black">Nuevo estado</label>
+              <select id="advanceStatus" aria-label="Nuevo estado" value={advanceStatus} onChange={e=>setAdvanceStatus(e.target.value as ShipmentStatus)} className="w-full bg-gray-100 rounded p-2 text-sm text-black">
                 <option value="">Selecciona...</option>
                 {validTransitions[selected.status].map(st => (
                   <option key={st} value={st}>{statusLabels[st]}</option>
@@ -286,17 +304,17 @@ const ShipmentsAdmin: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs mb-1">Carrier Tracking</label>
-                  <input value={carrierTrackingNumber} onChange={e=>setCarrierTrackingNumber(e.target.value)} className="w-full bg-gray-800 rounded p-2 text-sm" placeholder="Guía única" />
+                  <input value={carrierTrackingNumber} onChange={e=>setCarrierTrackingNumber(e.target.value)} className="w-full bg-gray-100 rounded p-2 text-sm text-black" placeholder="Guía única" />
                 </div>
               </div>
             )}
             <div>
               <label className="block text-xs mb-1">Ubicación</label>
-              <input value={location} onChange={e=>setLocation(e.target.value)} className="w-full bg-gray-800 rounded p-2 text-sm" placeholder="Ciudad / Centro" />
+              <input value={location} onChange={e=>setLocation(e.target.value)} className="w-full bg-gray-100 rounded p-2 text-sm" placeholder="Ciudad / Centro" />
             </div>
             <div>
               <label className="block text-xs mb-1">Descripción</label>
-              <textarea value={description} onChange={e=>setDescription(e.target.value)} className="w-full bg-gray-800 rounded p-2 text-sm" rows={3} placeholder="Detalle del avance" />
+              <textarea value={description} onChange={e=>setDescription(e.target.value)} className="w-full bg-gray-100 rounded p-2 text-sm" rows={3} placeholder="Detalle del avance" />
             </div>
             <div className="flex justify-end gap-2 mt-2">
               <Button variant="secondary" onClick={closeAdvance}>Cancelar</Button>
@@ -313,24 +331,24 @@ const ShipmentsAdmin: React.FC = () => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs mb-1">Foto (URL)</label>
-                <input value={photoUrl} onChange={e=>setPhotoUrl(e.target.value)} className="w-full bg-gray-800 rounded p-2 text-sm" placeholder="https://..." />
+                <input value={photoUrl} onChange={e=>setPhotoUrl(e.target.value)} className="w-full bg-gray-100 rounded p-2 text-sm" placeholder="https://..." />
               </div>
               <div>
                 <label className="block text-xs mb-1">Firma (texto)</label>
-                <input value={signature} onChange={e=>setSignature(e.target.value)} className="w-full bg-gray-800 rounded p-2 text-sm" placeholder="Nombre receptor" />
+                <input value={signature} onChange={e=>setSignature(e.target.value)} className="w-full bg-gray-100 rounded p-2 text-sm" placeholder="Nombre receptor" />
               </div>
             </div>
             <div>
               <label className="block text-xs mb-1">Ubicación entrega</label>
-              <input value={location} onChange={e=>setLocation(e.target.value)} className="w-full bg-gray-800 rounded p-2 text-sm" placeholder="Dirección final" />
+              <input value={location} onChange={e=>setLocation(e.target.value)} className="w-full bg-gray-100 rounded p-2 text-sm" placeholder="Dirección final" />
             </div>
             <div>
               <label className="block text-xs mb-1">Descripción</label>
-              <textarea value={description} onChange={e=>setDescription(e.target.value)} className="w-full bg-gray-800 rounded p-2 text-sm" rows={3} placeholder="Observaciones" />
+              <textarea value={description} onChange={e=>setDescription(e.target.value)} className="w-full bg-gray-100 rounded p-2 text-sm" rows={3} placeholder="Observaciones" />
             </div>
             <div>
               <label className="block text-xs mb-1">Notas</label>
-              <textarea value={deliveryNotes} onChange={e=>setDeliveryNotes(e.target.value)} className="w-full bg-gray-800 rounded p-2 text-sm" rows={2} placeholder="Notas internas" />
+              <textarea value={deliveryNotes} onChange={e=>setDeliveryNotes(e.target.value)} className="w-full bg-gray-100 rounded p-2 text-sm" rows={2} placeholder="Notas internas" />
             </div>
             <div className="flex justify-end gap-2 mt-2">
               <Button variant="secondary" onClick={closeConfirmDelivery}>Cancelar</Button>

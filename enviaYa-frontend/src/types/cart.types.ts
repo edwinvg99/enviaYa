@@ -2,8 +2,13 @@ import type { Product } from './product.types';
 
 export interface CartItem {
   productId: string | Product;
+  name?: string;
+  image?: string;
   quantity: number;
   price: number;
+  subtotal?: number;
+  addedAt?: Date;
+  priceLockedUntil?: Date;
 }
 
 export interface Cart {

@@ -60,11 +60,7 @@ const Tracking: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4 max-w-4xl mx-auto">
       <div className="flex items-center justify-center gap-3 mb-8">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-          </svg>
-        </div>
+       
         <h1 className="text-3xl font-bold text-slate-100">Seguimiento de Envíos</h1>
       </div>
       
@@ -135,7 +131,7 @@ const Tracking: React.FC = () => {
                   <p className="text-sm font-medium text-sky-400">{h.status}</p>
                   <p className="text-xs text-slate-400 mt-1">{new Date(h.timestamp).toLocaleString('es-ES')}</p>
                   <p className="text-sm mt-2 text-slate-200">{h.description}</p>
-                  <p className="text-xs mt-1 text-slate-500">📍 {h.location}</p>
+                  <p className="text-xs mt-1 text-slate-500">{h.location}</p>
                 </li>
               ))}
             </ul>

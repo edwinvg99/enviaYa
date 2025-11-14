@@ -1,4 +1,3 @@
-// Puerto (Interface) del repositorio de categorías
 import { Category } from '../entities/Category';
 
 export interface ICategoryRepository {

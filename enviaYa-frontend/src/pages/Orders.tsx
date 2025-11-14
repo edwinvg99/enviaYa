@@ -113,14 +113,14 @@ const Orders: React.FC = () => {
         {/* Header mejorado */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
+            {/* <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
-            </div>
+            </div> */}
             <h1 className="text-4xl font-bold text-slate-100">Mis Órdenes</h1>
           </div>
-          <p className="text-slate-400 ml-15">Revisa el estado y detalles de tus pedidos</p>
+          <p className="text-slate-400 ">Revisa el estado y detalles de tus pedidos</p>
         </div>
 
         {error && (

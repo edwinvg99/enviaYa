@@ -8,13 +8,29 @@ interface EmptyStateProps {
     label: string;
     onClick: () => void;
   };
+  // Opcionales para personalizar estilos por instancia
+  containerClassName?: string;
+  iconWrapperClassName?: string;
+  titleClassName?: string;
+  messageClassName?: string;
+  actionButtonClassName?: string;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, message, action }) => {
+const EmptyState: React.FC<EmptyStateProps> = ({
+  icon,
+  title,
+  message,
+  action,
+  containerClassName,
+  iconWrapperClassName,
+  titleClassName,
+  messageClassName,
+  actionButtonClassName,
+}) => {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4">
+    <div className={"flex flex-col items-center justify-center py-12 px-4" + (containerClassName ? ` ${containerClassName}` : "")}>
       {icon ? (
-        <div className="mb-4 text-gray-400">{icon}</div>
+        <div className={"mb-4 text-gray-400" + (iconWrapperClassName ? ` ${iconWrapperClassName}` : "")}>{icon}</div>
       ) : (
         <svg
           className="w-24 h-24 text-gray-400 mb-4"
@@ -31,13 +47,13 @@ const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, message, action })
         </svg>
       )}
       
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600 text-center max-w-md mb-6">{message}</p>
+      <h3 className={"text-xl font-semibold text-gray-900 mb-2" + (titleClassName ? ` ${titleClassName}` : "")}>{title}</h3>
+      <p className={"text-gray-600 text-center max-w-md mb-6" + (messageClassName ? ` ${messageClassName}` : "")}>{message}</p>
       
       {action && (
         <button
           onClick={action.onClick}
-          className="px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+          className={"px-6 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors" + (actionButtonClassName ? ` ${actionButtonClassName}` : "")}
         >
           {action.label}
         </button>

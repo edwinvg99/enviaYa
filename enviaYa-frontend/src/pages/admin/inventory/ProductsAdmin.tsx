@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { productService } from '../../../services/product.service';
 import { categoryService } from '../../../services/category.service';
 import { supplierService } from '../../../services/supplier.service';
@@ -29,6 +30,7 @@ const defaultForm: Partial<Product> = {
   }
 
 const ProductsAdmin: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const role = user?.role || 'USER';
 
@@ -224,16 +226,20 @@ const ProductsAdmin: React.FC = () => {
           />
         )}
 
-      <div className="flex items-end gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6">
+        <h1 className="text-3xl font-bold text-slate-100">Inventario</h1>
+      </div>
+
+      <div className="flex items-end gap-3 mb-6 ">
         <Input
           label="Buscar"
           placeholder="Nombre del producto"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="bg-slate-800 text-slate-100 border-slate-700 placeholder-slate-400 focus:ring-sky-500"
+          className="bg-slate-800 text-slate-100 border-slate-700 placeholder-slate-400 focus:ring-sky-500 "
         />
         {canAdjustStock && (
-          <div className="flex flex-col">
+          <div className="flex flex-col ">
             <label className="text-sm font-medium text-slate-300 mb-2">Estado</label>
             <select
               aria-label="Filtro por estado"
@@ -249,7 +255,7 @@ const ProductsAdmin: React.FC = () => {
         )}
         <div className="ml-auto" />
         {canCreate && (
-            <Button onClick={openCreate}>+ Nuevo producto</Button>
+            <Button onClick={openCreate} className="whitespace-nowrap">+ Nuevo producto</Button>
         )}
       </div>
 

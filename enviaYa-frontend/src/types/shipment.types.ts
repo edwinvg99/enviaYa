@@ -48,14 +48,9 @@ export interface Shipment {
   updatedAt?: string | Date;
 }
 
+// Backend actualmente solo requiere orderId para crear el envío (otros datos se derivan en el use case)
 export interface CreateShipmentPayload {
   orderId: string;
-  userId: string;
-  trackingNumber: string;
-  carrier: string;
-  shippingAddress: Shipment['shippingAddress'];
-  estimatedDelivery: string | Date;
-  notes?: string;
 }
 
 export interface UpdateShipmentStatusPayload {
