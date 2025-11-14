@@ -38,7 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           {/* Badge de stock bajo */}
           {product.stock > 0 && product.stock <= 5 && (
             <div className="absolute top-2 right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg shadow-orange-500/30">
-              ¡Pocas!
+              ¡Pocas unidades!
             </div>
           )}
           

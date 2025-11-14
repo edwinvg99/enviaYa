@@ -7,7 +7,7 @@ import type { RegisterData } from '../types/user.types';
 
 const isValidEmail = (email: string): boolean => /\S+@\S+\.\S+/.test(email);
 
-const isValidPhone = (phone: string): boolean => /^\+?[\d\s-]+$/.test(phone);
+const isValidPhone = (phone: string): boolean => /^\+57\d{10}$/.test(phone);
 
 const isValidPassword = (password: string): boolean => password.length >= 6;
 
@@ -27,6 +27,7 @@ const Register: React.FC = () => {
       country: 'Colombia'
     }
   });
+  const [phoneDigits, setPhoneDigits] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -57,6 +58,16 @@ const Register: React.FC = () => {
     }
   };
 
+  const handlePhoneDigitsChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const raw = e.target.value || '';
+    const digits = raw.replace(/\D/g, '').slice(0, 10);
+    setPhoneDigits(digits);
+    setFormData(prev => ({ ...prev, phone: digits ? `+57${digits}` : '' }));
+    if (errors.phone) {
+      setErrors({ ...errors, phone: '' });
+    }
+  };
+
   const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setConfirmPassword(e.target.value);
     if (errors.confirmPassword) {
@@ -84,7 +95,7 @@ const Register: React.FC = () => {
     }
 
     if (!formData.phone || !isValidPhone(formData.phone)) {
-      newErrors.phone = 'Ingresa un número de teléfono válido';
+      newErrors.phone = 'Ingresa un número de teléfono de Colombia válido (+57 y 10 dígitos)';
     }
 
     if (!formData.address?.street || formData.address.street.trim().length < 5) {
@@ -190,16 +201,26 @@ const Register: React.FC = () => {
             required
           />
 
-          <Input
-            label="Teléfono"
-            type="tel"
-            name="phone"
-            value={formData.phone || ''}
-            onChange={handleChange}
-            placeholder="+57 300 123 4567"
-            error={errors.phone}
-            required
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+            <div className="flex rounded-lg shadow-sm border border-gray-300 overflow-hidden">
+              <span className="inline-flex items-center px-3 bg-gray-100 text-gray-700 text-sm select-none">+57</span>
+              <input
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                name="phoneDigits"
+                value={phoneDigits}
+                onChange={handlePhoneDigitsChange}
+                placeholder="3001234567"
+                className="flex-1 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                maxLength={10}
+                required
+              />
+            </div>
+            {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+            <p className="mt-1 text-xs text-gray-500">Solo 10 dígitos. El prefijo +57 se añade automáticamente.</p>
+          </div>
 
           <Input
             label="Contraseña"
