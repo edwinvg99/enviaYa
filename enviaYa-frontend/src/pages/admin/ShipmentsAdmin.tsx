@@ -193,7 +193,7 @@ const ShipmentsAdmin: React.FC = () => {
           <button key={t} onClick={() => changeTab(t as 'ALL' | ShipmentStatus)} className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab===t? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30': 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'}`}>{t==='ALL'? 'Todos': statusLabels[t as ShipmentStatus]}</button>
         ))}
         {user?.role === 'ADMIN' && (
-          <button onClick={markOverdueLost} className="ml-auto px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium shadow-lg shadow-red-600/30 transition">Marcar vencidos como perdidos</button>
+          <button onClick={markOverdueLost} className=""></button>
         )}
       </div>
       {loading && <Loading />}
@@ -205,8 +205,8 @@ const ShipmentsAdmin: React.FC = () => {
             <tr className="text-slate-300">
               <th className="p-3 text-left">Tracking</th>
               <th className="p-3 text-left">Estado</th>
-              <th className="p-3 text-left">Orden</th>
-              <th className="p-3 text-left">Usuario</th>
+              <th className="p-3 text-left">Nº Orden</th>
+              <th className="p-3 text-left">Cliente</th>
               <th className="p-3 text-left">Carrier</th>
               <th className="p-3 text-left">Guía</th>
               <th className="p-3 text-left">Est. Entrega</th>
@@ -220,8 +220,8 @@ const ShipmentsAdmin: React.FC = () => {
                 <td className="p-3">
                   <span className="px-2 py-1 rounded bg-slate-700 text-slate-200 text-xs font-medium border border-slate-600">{statusLabels[s.status]}</span>
                 </td>
-                <td className="p-3 text-slate-300">{s.orderId}</td>
-                <td className="p-3 text-slate-300">{s.userId}</td>
+                <td className="p-3 text-slate-300">{typeof s.orderId === 'object' ? s.orderId.orderNumber : s.orderId}</td>
+                <td className="p-3 text-slate-300">{typeof s.userId === 'object' ? (s.userId.name || s.userId.email || s.userId._id) : s.userId}</td>
                 <td className="p-3 text-slate-300">{s.carrier}</td>
                 <td className="p-3 text-slate-300">{s.carrierTrackingNumber || '-'}</td>
                 <td className="p-3 text-slate-300">{formatDate(s.estimatedDelivery)}</td>

@@ -47,7 +47,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         </svg>
       )}
       
-      <h3 className={"text-xl font-semibold text-gray-900 mb-2" + (titleClassName ? ` ${titleClassName}` : "")}>{title}</h3>
+      <h3 className={"text-xl font-semibold text-gray-100 mb-2" + (titleClassName ? ` ${titleClassName}` : "")}>{title}</h3>
       <p className={"text-gray-600 text-center max-w-md mb-6" + (messageClassName ? ` ${messageClassName}` : "")}>{message}</p>
       
       {action && (

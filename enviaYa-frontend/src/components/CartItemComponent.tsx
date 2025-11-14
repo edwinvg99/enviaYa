@@ -114,7 +114,7 @@ const CartItemComponent: React.FC<CartItemComponentProps> = ({
       <button
         onClick={() => onRemove(productId)}
         disabled={isUpdating}
-        className="text-red-400 hover:text-red-300 hover:shadow-lg hover:shadow-red-500/30 transition-all disabled:opacity-50"
+        className="text-red-400  transition-all disabled:opacity-50 hover:scale-130"
         aria-label="Eliminar producto"
       >
         <svg

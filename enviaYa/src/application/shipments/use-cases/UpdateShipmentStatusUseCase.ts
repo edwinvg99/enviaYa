@@ -1,14 +1,17 @@
 import { ShipmentRepositoryMongo } from '../../../infrastructure/persistence/mongo/repositories/ShipmentRepositoryMongo';
 import { NotificationRepositoryMongo } from '../../../infrastructure/persistence/mongo/repositories/NotificationRepositoryMongo';
+import { OrderRepositoryMongo } from '../../../infrastructure/persistence/mongo/repositories/OrderRepositoryMongo';
 import { ShipmentStatus } from '../../../domain/shipments/entities/Shipment';
 
 export class UpdateShipmentStatusUseCase {
   private shipmentRepository: ShipmentRepositoryMongo;
   private notificationRepository: NotificationRepositoryMongo;
+  private orderRepository: OrderRepositoryMongo;
 
   constructor() {
     this.shipmentRepository = new ShipmentRepositoryMongo();
     this.notificationRepository = new NotificationRepositoryMongo();
+    this.orderRepository = new OrderRepositoryMongo();
   }
 
   async execute(
@@ -89,6 +92,16 @@ export class UpdateShipmentStatusUseCase {
       isRead: false
     });
 
+    // Mantener orden y envío alineados: mapear estados de envío a estados de orden
+    const orderStatus = this.mapShipmentStatusToOrderStatus(newStatus);
+    if (orderStatus) {
+      try {
+        await this.orderRepository.update(shipment.orderId, { status: orderStatus });
+      } catch (err) {
+        // No bloquear la actualización del envío si falla la sincronización de la orden
+      }
+    }
+
     return updatedShipment;
   }
 
@@ -105,5 +118,28 @@ export class UpdateShipmentStatusUseCase {
     };
 
     return validTransitions[currentStatus]?.includes(newStatus) || false;
+  }
+
+  private mapShipmentStatusToOrderStatus(status: ShipmentStatus): 'PREPARANDO' | 'EN_TRANSITO' | 'EN_ENTREGA' | 'ENTREGADO' | 'CANCELADO' | null {
+    switch (status) {
+      case 'PENDIENTE':
+        // El envío recién creado mantiene la orden en PREPARANDO
+        return 'PREPARANDO';
+      case 'PREPARANDO':
+        return 'PREPARANDO';
+      case 'EN_TRANSITO':
+        return 'EN_TRANSITO';
+      case 'EN_ENTREGA':
+        return 'EN_ENTREGA';
+      case 'ENTREGADO':
+        return 'ENTREGADO';
+      case 'CANCELADO':
+        return 'CANCELADO';
+      // Estados específicos de envío sin equivalente directo en orden
+      case 'DEVUELTO':
+      case 'PERDIDO':
+      default:
+        return null;
+    }
   }
 }

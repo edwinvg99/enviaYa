@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderService } from '../services/order.service';
+import { shipmentService } from '../services/shipment.service';
 import { useAuth } from '../context/AuthContext';
 import Loading from '../components/Loading';
 import EmptyState from '../components/EmptyState';
@@ -9,6 +10,7 @@ import Badge from '../components/Badge';
 import Modal from '../components/Modal';
 import Button from '../components/Button';
 import type { Order, OrderStatus } from '../types/order.types';
+import type { Shipment } from '../types/shipment.types';
 
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -18,6 +20,7 @@ const Orders: React.FC = () => {
   const [canceling, setCanceling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+  const [orderTrackingMap, setOrderTrackingMap] = useState<Record<string, string>>({});
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -38,6 +41,21 @@ const Orders: React.FC = () => {
       setError(null);
       const ordersData = await orderService.getUserOrders(user._id!);
       setOrders(ordersData);
+
+      // Cargar envíos del usuario y mapear tracking por orden
+      try {
+        const shipments = await shipmentService.getUserShipments(user._id!);
+        const map: Record<string, string> = {};
+        shipments.forEach((s: Shipment) => {
+          const oid = typeof s.orderId === 'object' ? s.orderId._id : s.orderId;
+          if (oid && s.trackingNumber) {
+            map[oid] = s.trackingNumber;
+          }
+        });
+        setOrderTrackingMap(map);
+      } catch {
+        // No bloqueamos la vista de órdenes si falla la carga de envíos
+      }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(error.response?.data?.message || 'Error al cargar órdenes');
@@ -267,6 +285,13 @@ const Orders: React.FC = () => {
               </div>
 
               <div>
+                <p className="text-sm text-gray-600 mb-1">Tracking:</p>
+                <p className="font-mono font-semibold">
+                  {orderTrackingMap[selectedOrder._id] || '—'}
+                </p>
+              </div>
+
+              <div>
                 <p className="text-sm text-gray-600 mb-2">Dirección de envío:</p>
                 <div className="bg-gray-50 p-3 rounded">
                   <p>{selectedOrder.shippingAddress.street}</p>
@@ -283,10 +308,14 @@ const Orders: React.FC = () => {
                 <p className="text-sm text-gray-600 mb-2">Productos:</p>
                 <div className="space-y-2">
                   {selectedOrder.items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded">
-                      <span className="font-medium">Producto {index + 1}</span>
-                      <span>x{item.quantity}</span>
-                      <span className="font-semibold">{formatPrice(item.subtotal)}</span>
+                    <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">
+                          {typeof item.productId === 'object' ? item.productId.name : `Producto ${index + 1}`}
+                        </p>
+                        <p className="text-xs text-gray-500">Cantidad: {item.quantity}</p>
+                      </div>
+                      <span className="font-semibold text-gray-900">{formatPrice(item.subtotal)}</span>
                     </div>
                   ))}
                 </div>

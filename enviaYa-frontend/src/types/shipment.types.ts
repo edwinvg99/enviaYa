@@ -25,8 +25,8 @@ export interface DeliveryConfirmation {
 
 export interface Shipment {
   _id?: string;
-  orderId: string;
-  userId: string;
+  orderId: string | { _id: string; orderNumber: string };
+  userId: string | { _id: string; name: string; email: string };
   trackingNumber: string;
   status: ShipmentStatus;
   currentLocation: string;

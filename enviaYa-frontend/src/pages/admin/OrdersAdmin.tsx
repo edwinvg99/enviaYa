@@ -208,7 +208,11 @@ const OrdersAdmin: React.FC = () => {
                   <tr key={order._id} className="border-b border-slate-700 hover:bg-slate-700/30 transition">
                     <td className="py-3 px-4 font-medium text-slate-100">{order.orderNumber}</td>
                     <td className="py-3 px-4 text-slate-300 text-xs">{formatDate(order.createdAt)}</td>
-                    <td className="py-3 px-4 text-slate-300">{order.userId}</td>
+                    <td className="py-3 px-4 text-slate-300">
+                      {typeof order.userId === 'object'
+                        ? (order.userId.name || order.userId.email || order.userId._id)
+                        : order.userId}
+                    </td>
                     <td className="py-3 px-4 text-slate-300">{order.items.length}</td>
                     <td className="py-3 px-4 text-sky-400 font-semibold">{formatCurrency(order.total)}</td>
                     <td className="py-3 px-4">{getStatusBadge(order.status)}</td>
@@ -280,7 +284,9 @@ const OrdersAdmin: React.FC = () => {
                   <tbody>
                     {selectedOrder.items.map((item, idx) => (
                       <tr key={idx} className="border-t border-gray-700">
-                        <td className="py-2 px-3 text-gray-300">{item.productId}</td>
+                        <td className="py-2 px-3 text-gray-300">
+                          {typeof item.productId === 'object' ? item.productId.name : item.productId}
+                        </td>
                         <td className="py-2 px-3 text-gray-300">{item.quantity}</td>
                         <td className="py-2 px-3 text-right text-gray-300">{formatCurrency(item.unitPrice)}</td>
                         <td className="py-2 px-3 text-right text-gray-200 font-medium">{formatCurrency(item.subtotal)}</td>

@@ -712,7 +712,7 @@
  * /shipments:
  *   post:
  *     summary: Crear un nuevo envío (ADMIN/VENDOR)
- *     description: Crea un envío para una orden en estado PREPARANDO y genera número de tracking único (formato TRK-YYYYMMDD-XXXXX). Automáticamente cambia la orden a estado EN_TRANSITO.
+ *     description: Crea un envío para una orden en estado PREPARANDO y genera número de tracking único (formato TRK-YYYYMMDD-XXXXX). No cambia el estado de la orden; la orden permanece en PREPARANDO hasta que el envío avance a EN_TRANSITO.
  *     tags: [Shipments]
  *     security:
  *       - UserAuth: []

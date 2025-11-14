@@ -11,7 +11,7 @@ export type OrderStatus =
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
 
 export interface OrderItem {
-  productId: string;
+  productId: string | { _id: string; name: string; price: number };
   quantity: number;
   unitPrice: number;
   price: number;
@@ -21,7 +21,7 @@ export interface OrderItem {
 export interface Order {
   _id: string;
   orderNumber: string;
-  userId: string;
+  userId: string | { _id: string; name: string; email: string };
   status: OrderStatus;
   items: OrderItem[];
   subtotal: number;

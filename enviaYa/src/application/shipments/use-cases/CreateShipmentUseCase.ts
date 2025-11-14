@@ -51,8 +51,11 @@ export class CreateShipmentUseCase {
     };
 
     const shipment = await this.shipmentRepository.create(shipmentData);
-
-    await this.orderRepository.update(orderId, { status: "EN_TRANSITO" });
+    // Nota: Ya no cambiamos el estado de la orden a EN_TRANSITO aquí.
+    // La orden debe permanecer en PREPARANDO hasta que el envío avance
+    // explícitamente a EN_TRANSITO mediante el flujo de actualización de envíos.
+    // Esto evita que al presionar "Preparar" la orden salte directamente
+    // a EN_TRANSITO.
 
     return shipment;
   }
