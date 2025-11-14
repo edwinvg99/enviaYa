@@ -4,6 +4,11 @@ import { CreateShipmentUseCase } from '../../../application/shipments/use-cases/
 import { UpdateShipmentStatusUseCase } from '../../../application/shipments/use-cases/UpdateShipmentStatusUseCase';
 import { MarkOverdueShipmentsAsLostUseCase } from '../../../application/shipments/use-cases/MarkOverdueShipmentsAsLostUseCase';
 import { successResponse, errorResponse } from '../../../shared/utils/responses';
+import { UserModel } from '../../persistence/data/models/UserModel';
+import { OrderRepositoryMongo } from '../../persistence/mongo/repositories/OrderRepositoryMongo';
+import { EmailService } from '../../../application/services/EmailService';
+
+
 
 export const getShipments = async (req: Request, res: Response) => {
   try {
@@ -61,6 +66,9 @@ export const createShipment = async (req: Request, res: Response) => {
   }
 };
 
+
+
+
 export const updateShipmentStatus = async (req: Request, res: Response) => {
   try {
     const updateShipmentStatusUseCase = new UpdateShipmentStatusUseCase();
@@ -76,12 +84,36 @@ export const updateShipmentStatus = async (req: Request, res: Response) => {
       carrierTrackingNumber,
       deliveryConfirmation
     );
+
+    
+    if (shipment.status === "ENTREGADO") {
+      const orderRepo = new OrderRepositoryMongo();
+      const order = await orderRepo.findById(shipment.orderId);
+
+      if (order) {
+        const user = await UserModel.findById(order.userId);
+        if (user) {
+          await EmailService.sendOrderEmail({
+            email_type: "ORDER_DELIVERED",
+            to_email: user.email,
+            user_name: user.name ?? "Cliente",
+            order_number: order.orderNumber,
+            order_total: order.total,
+            order_status: "ENTREGADO",
+            delivery_date: new Date().toLocaleDateString("es-CO"),
+          });
+        }
+      }
+    }
     
     res.json(successResponse(200, 'Estado de envío actualizado exitosamente', shipment));
   } catch (error) {
     res.status(400).json(errorResponse(400, 'Error al actualizar estado de envío', error));
   }
 };
+
+
+
 
 export const getShipmentsByStatus = async (req: Request, res: Response) => {
   try {
@@ -118,6 +150,8 @@ export const markOverdueAsLost = async (req: Request, res: Response) => {
   }
 };
 
+
+
 export const confirmDelivery = async (req: Request, res: Response) => {
   try {
     const updateShipmentStatusUseCase = new UpdateShipmentStatusUseCase();
@@ -151,8 +185,28 @@ export const confirmDelivery = async (req: Request, res: Response) => {
       undefined,
       deliveryConfirmation
     );
-    
+
+   
+    const orderRepo = new OrderRepositoryMongo();
+    const order = await orderRepo.findById(shipment.orderId);
+
+    if (order) {
+      const user = await UserModel.findById(order.userId);
+      if (user) {
+        await EmailService.sendOrderEmail({
+          email_type: "ORDER_DELIVERED",
+          to_email: user.email,
+          user_name: user.name ?? "Cliente",
+          order_number: order.orderNumber,
+          order_total: order.total,
+          order_status: "ENTREGADO",
+          delivery_date: new Date().toLocaleDateString("es-CO"),
+        });
+      }
+    }
+
     res.json(successResponse(200, 'Entrega confirmada exitosamente', updatedShipment));
+
   } catch (error: any) {
     res.status(400).json(errorResponse(400, 'Error al confirmar entrega', error.message || error));
   }
