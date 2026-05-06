@@ -1,27 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
-// Middleware de autenticación simulado (para desarrollo)
+interface JWTPayload {
+  _id: string;
+  role: 'USER' | 'ADMIN' | 'VENDOR';
+  email: string;
+}
+
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
-  const userId = req.headers['x-user-id'] as string;
-  const userRole = req.headers['x-user-role'] as string;
-
-  if (!userId || !userRole) {
+  if (!token) {
     return res.status(401).json({
       success: false,
-      error: {
-        code: 401,
-        message: 'No autorizado. Debes incluir x-user-id y x-user-role en los headers'
-      }
+      error: { code: 401, message: 'No autorizado. Token requerido.' }
     });
   }
 
-  req.user = {
-    _id: userId,
-    role: userRole as 'USER' | 'ADMIN' | 'VENDOR'
-  };
-
-  next();
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
+    req.user = { _id: decoded._id, role: decoded.role, email: decoded.email };
+    next();
+  } catch {
+    return res.status(401).json({
+      success: false,
+      error: { code: 401, message: 'Token inválido o expirado.' }
+    });
+  }
 };
 
 export const authorizeRoles = (...roles: string[]) => {
@@ -29,10 +35,7 @@ export const authorizeRoles = (...roles: string[]) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        error: {
-          code: 401,
-          message: 'No autorizado'
-        }
+        error: { code: 401, message: 'No autorizado' }
       });
     }
 

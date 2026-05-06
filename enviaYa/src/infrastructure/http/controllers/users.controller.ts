@@ -70,10 +70,16 @@ export const loginUser = async (req: Request, res: Response) => {
         .json({ message: 'Debes verificar tu cuenta antes de iniciar sesión.' });
     }
 
+    const token = jwt.sign(
+      { _id: user._id, role: user.role, email: user.email },
+      process.env.JWT_SECRET!,
+      { expiresIn: '7d' }
+    );
 
     res.status(200).json({
       message: 'Inicio de sesión exitoso',
       user,
+      token,
     });
   } catch (error: any) {
     res.status(401).json({ error: error.message });

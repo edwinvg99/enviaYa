@@ -1,5 +1,5 @@
 // Puerto (Interface) del repositorio de productos
-import { Product } from '../entities/Product';
+import { IProduct as Product } from '../entities/Product';
 
 export interface IProductRepository {
   findAll(): Promise<Product[]>;
