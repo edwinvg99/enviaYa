@@ -1,6 +1,8 @@
 import api from './api';
 import type { Category, CategoryPayload } from '../types/category.types';
 
+export type { Category };
+
 export const getCategories = async (): Promise<Category[]> => {
   const response = await api.get<{ success: boolean; data: Category[] }>('/categories');
   return response.data.data;

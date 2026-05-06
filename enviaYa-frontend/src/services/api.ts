@@ -11,29 +11,19 @@ interface ApiErrorResponse {
 
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 10000, 
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  timeout: 15000,
+  headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        config.headers['x-user-id'] = user._id || user.id;
-        config.headers['x-user-role'] = user.role;
-      } catch (error) {
-        console.error('Error parsing user from localStorage:', error);
-      }
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
@@ -41,7 +31,7 @@ api.interceptors.response.use(
   (error: AxiosError<ApiErrorResponse>) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('user');
-      // Redirigir al login
+      localStorage.removeItem('token');
       window.location.href = '/login';
     }
 

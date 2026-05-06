@@ -66,7 +66,7 @@ const Login: React.FC = () => {
 
     try {
       const response = await authService.login(formData);
-      login(response.user);
+      login(response.user, response.token!);
       if (response.user.role === 'ADMIN' || response.user.role === 'VENDOR') {
         navigate('/admin');
       } else {

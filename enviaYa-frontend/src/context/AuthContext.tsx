@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (user: User) => void;
+  login: (user: User, token: string) => void;
   logout: () => void;
 }
 
@@ -17,30 +17,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
+    const initializeAuth = () => {
       try {
         const currentUser = authService.getCurrentUser();
-        
-        if (currentUser) {
+        const token = authService.getToken();
+        if (currentUser && token) {
           setUser(currentUser);
         } else {
-          // Limpiar si no hay usuario
           authService.logout();
         }
-      } catch (error) {
-        console.error('Error inicializando autenticación:', error);
+      } catch {
         authService.logout();
       } finally {
         setIsLoading(false);
       }
     };
-
     initializeAuth();
   }, []);
 
-  const login = useCallback((userData: User) => {
-    setUser(userData);
+  const login = useCallback((userData: User, token: string) => {
     localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', token);
+    setUser(userData);
   }, []);
 
   const logout = useCallback(() => {
@@ -50,25 +48,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'user' && !e.newValue) {
+      if ((e.key === 'user' || e.key === 'token') && !e.newValue) {
         logout();
       }
     };
-
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [logout]);
 
-  const value: AuthContextType = {
-    user,
-    isAuthenticated: !!user,
-    isLoading,
-    login,
-    logout,
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -76,8 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };

@@ -1,5 +1,5 @@
 import api from './api';
-import type { Cart, AddToCartRequest, RemoveFromCartRequest, CartResponse } from '../types/cart.types';
+import type { Cart, AddToCartRequest, RemoveFromCartRequest } from '../types/cart.types';
 
 export const cartService = {
   getCart: async (userId: string): Promise<Cart> => {

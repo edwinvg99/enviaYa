@@ -11,6 +11,7 @@ import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
 import OrderSuccess from './pages/OrderSuccess';
 import Tracking from './pages/Tracking';
+import NotFound from './pages/NotFound';
 import RoleRoute from './components/RoleRoute';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/admin/Dashboard';
@@ -25,41 +26,34 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="min-h-screen bg-slate-900">
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/tracking/:trackingNumber" element={<Tracking />} />
-            <Route
-              path="/admin"
-              element={
-                <RoleRoute roles={["ADMIN", "VENDOR"]}>
-                  <AdminDashboard />
-                </RoleRoute>
-              }
-            />
-           <Route path="/admin/orders" element={<RoleRoute roles={['ADMIN', 'VENDOR']}><OrdersAdmin /></RoleRoute>} />
-             <Route path="/admin/shipments" element={<RoleRoute roles={['ADMIN', 'VENDOR']}><ShipmentsAdmin /></RoleRoute>} />
+
+            <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+            <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+            <Route path="/orders/success/:orderId" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+
+            <Route path="/admin" element={<RoleRoute roles={['ADMIN', 'VENDOR']}><AdminDashboard /></RoleRoute>} />
+            <Route path="/admin/orders" element={<RoleRoute roles={['ADMIN', 'VENDOR']}><OrdersAdmin /></RoleRoute>} />
+            <Route path="/admin/shipments" element={<RoleRoute roles={['ADMIN', 'VENDOR']}><ShipmentsAdmin /></RoleRoute>} />
             <Route
               path="/admin/inventory/*"
-              element={
-                <RoleRoute roles={["ADMIN", "VENDOR"]}>
-                  <InventoryLayout />
-                </RoleRoute>
-              }
+              element={<RoleRoute roles={['ADMIN', 'VENDOR']}><InventoryLayout /></RoleRoute>}
             >
               <Route path="products" element={<ProductsAdmin />} />
               <Route path="categories" element={<CategoriesAdmin />} />
               <Route path="suppliers" element={<SuppliersAdmin />} />
             </Route>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-            <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-            <Route path="/orders/success/:orderId" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </AuthProvider>
@@ -68,4 +62,3 @@ function App() {
 }
 
 export default App;
-

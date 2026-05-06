@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { productService } from '../../../services/product.service';
 import { categoryService } from '../../../services/category.service';
 import { supplierService } from '../../../services/supplier.service';
@@ -30,7 +29,6 @@ const defaultForm: Partial<Product> = {
   }
 
 const ProductsAdmin: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const role = user?.role || 'USER';
 

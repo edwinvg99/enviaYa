@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"C:\\\\Users\\\\AsusTUF\\\\OneDrive\\\\Documents\\\\EDWIN PASAR\\\\IMPORTANTE\\\\universidad\\\\Copia Universidad\\\\semestre 10\\\\Desarrollo\\\\new version envia-ya\" log --oneline --max-count=15)",
+      "Bash(npm install *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

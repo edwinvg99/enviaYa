@@ -1,5 +1,5 @@
 import api from './api';
-import type { Shipment, ShipmentStatus, CreateShipmentPayload, UpdateShipmentStatusPayload, ApiResponse } from '../types/shipment.types';
+import type { Shipment, ShipmentStatus, UpdateShipmentStatusPayload, ApiResponse } from '../types/shipment.types';
 
 const unwrap = <T,>(resp: { data: ApiResponse<T> }): T => resp.data.data;
 
